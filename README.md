@@ -1,1 +1,1 @@
-# Phune Gaming SDK for ActionScript 3
+# Phune Gaming SDK for Marmalade
