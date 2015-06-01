@@ -45,7 +45,12 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, const char *level, JampScore sc
 	std::string key_score = std::string(SCORE_LEVEL_KEY_PREFIX);
 	key_score.append(level);
 
-	score.matchId = currentMatch->matchId;
+
+	char buffer2[50];
+	sprintf(buffer2, "%d", currentMatch->matchId);
+	std::string s2 = std::string(buffer2);
+	
+	score.matchId = s2;
 
 	PhunePlayer player;
 	player.score = score.score;
