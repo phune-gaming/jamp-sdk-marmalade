@@ -1,2 +1,1 @@
-# pg-sdk-marmalade
-Phune Gaming SDK for Marmalade
+# Phune Gaming SDK for ActionScript 3
