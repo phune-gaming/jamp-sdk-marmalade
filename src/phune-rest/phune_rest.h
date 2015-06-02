@@ -88,7 +88,7 @@ public:
 	@param onResult The callback in case of success. It returns in the first paramenter a match id as a char*.
 	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
 	*/
-	int32 EndMatch(const char *matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError);
+	int32 EndMatch(int64 matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError);
 
 };
 

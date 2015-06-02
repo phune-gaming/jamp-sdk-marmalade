@@ -22,7 +22,7 @@ public:
 
 public:
 	//The id of the pack
-	std::string packId;
+	int64 packId;
 	//Stars won by the player in pack
 	int64 starsWon;
 	//Maximum stars a player could achieve

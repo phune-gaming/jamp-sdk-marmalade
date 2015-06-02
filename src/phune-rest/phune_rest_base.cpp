@@ -425,10 +425,10 @@ int32 PhuneRestBase::_StartMatch(const char *gameId, s3eCallback onResult, s3eCa
 
 	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::POST, GotResult, PHUNE_MATCH_OBJECT, gameId);
 }
-int32 PhuneRestBase::_EndMatch(const char *matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError){
+int32 PhuneRestBase::_EndMatch(int64 matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError){
 	char resource[200];
 	std::memset(resource, 0, sizeof(resource));
-	sprintf(resource, "/jamp/matches/%s/finish", matchId);
+	sprintf(resource, "/jamp/matches/%d/finish", matchId);
 
 	IwTrace(PHUNE, ("End match:%s", player.Serialize().c_str()));
 	if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
@@ -628,17 +628,15 @@ int32 RequestData::GotHeaders(void*, void *userData)
 
 	IwTrace(PHUNE, ("on got headers INIT"));
 	
-	if (requestData->http_object->GetStatus() == S3E_RESULT_ERROR || requestData->http_object->GetResponseCode() >= 400 || requestData->http_object->GetResponseCode() == 204)
+	if (requestData->http_object->GetStatus() == S3E_RESULT_ERROR || requestData->http_object->GetResponseCode() >= 400)
 	{
-		// Something has gone wrong
-		//status = kError;
 		IwTrace(PHUNE, ("on got headers ERROR"));
 		requestData->requestStatus = REQUEST_ERROR;
 		requestData->onResult(new RequestError(REQUEST_ERROR, requestData->http_object->GetResponseCode()), requestData);
 		return 0;
 	}
-	if (requestData->responseObjectType == NONE){
-		IwTrace(PHUNE, ("on got headers NONE"));
+	if (requestData->responseObjectType == NONE || requestData->http_object->GetResponseCode() == 204){
+		IwTrace(PHUNE, ("on got headers NONE or No content"));
 		requestData->onResult(NULL, requestData);
 	}
 	else

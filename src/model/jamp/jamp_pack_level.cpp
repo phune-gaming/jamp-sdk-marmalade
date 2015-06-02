@@ -13,7 +13,7 @@ int32 JampPackLevel::Deserialize(std::string jsonSrc)
 
 int32 JampPackLevel::DeserializeFromValue(Value src){
 	if (!src["levelId"].empty())
-		levelId = src["levelId"].asString();
+		levelId = src["levelId"].asUInt64();
 
 	if (!src["starsWon"].empty())
 		starsWon = src["starsWon"].asUInt64();

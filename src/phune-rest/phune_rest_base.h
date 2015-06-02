@@ -247,7 +247,7 @@ protected:
 
 	int32 _StartMatch(const char *gameId, s3eCallback onResult, s3eCallback onError);
 
-	int32 _EndMatch(const char *matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError);
+	int32 _EndMatch(int64 matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError);
 public:
 	
 
