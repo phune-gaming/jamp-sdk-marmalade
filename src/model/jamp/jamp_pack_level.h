@@ -20,7 +20,7 @@ public:
 
 public:
 	//The id of the level
-	std::string levelId;
+	int64 levelId;
 	//Stars won by the player in level
 	int64 starsWon;
 	

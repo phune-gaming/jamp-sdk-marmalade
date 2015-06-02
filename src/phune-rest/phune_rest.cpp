@@ -38,6 +38,6 @@ int32 PhuneRest::StartMatch(const char *gameId, s3eCallback onResult, s3eCallbac
 	return PhuneRestBase::_StartMatch(gameId, onResult, onError);
 }
 
-int32 PhuneRest::EndMatch(const char *matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError){
+int32 PhuneRest::EndMatch(int64 matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError){
 	return PhuneRestBase::_EndMatch(matchId, player, onResult, onError);
 }

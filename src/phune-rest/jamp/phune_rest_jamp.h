@@ -74,7 +74,7 @@ public:
 	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
 	@param pack (Optional) pack information after match (if any changes occurred).
 	*/
-	int32 EndMatch(JampGameId gameId, const char *level, JampScore score, PlayerStatus status, s3eCallback onResult, s3eCallback onError);
+	int32 EndMatch(JampGameId gameId, int64 level, JampScore score, PlayerStatus status, s3eCallback onResult, s3eCallback onError);
 
 	/*
 	Get the historical data for level in Game.
@@ -104,7 +104,7 @@ public:
 	@param onResult The callback in case of success. Return a JampPack.
 	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
 	*/
-	int32 GetPackInfoInGame(JampGameId gameId, const char *packId, s3eCallback onResult, s3eCallback onError);
+	int32 GetPackInfoInGame(JampGameId gameId, int64 packId, s3eCallback onResult, s3eCallback onError);
 
 	/*
 	Stores the list of packs in Game.

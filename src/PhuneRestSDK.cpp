@@ -223,13 +223,13 @@ static int32 onMatchId(void *data, void*){
 	score.cellsPerformance.pushElement(cellPerformace);
 
 	JampPack *pack = new JampPack();
-	pack->packId = "2";
+	pack->packId = 2;
 	pack->blocked = false;
 	pack->starsMax = 32;
 	pack->starsWon = 11;
 
 	//pr->EndMatch(matchId, pp, onEndMatch, onError);
-	pr->EndMatch(RHYTHM, "1", score, WINNER, onEndMatch, onError);
+	pr->EndMatch(RHYTHM, 1, score, WINNER, onEndMatch, onError);
 
 	//pr->GetMe(onResultPhuneUser, onError);
 
@@ -345,7 +345,7 @@ static int32 onGetScore(void *data, void*){
 	char aux[100];
 	unsigned int i = 0;
 	while (i < listOfscores.elements.size()){
-		sprintf(aux, "`x000000[%lld]I have points %lld in match %s", pr->getCurrentTime(), listOfscores.elements.at(i).score, listOfscores.elements.at(i).matchId.c_str());
+		sprintf(aux, "`x000000[%lld]I have points %lld in match %d", pr->getCurrentTime(), listOfscores.elements.at(i).score, listOfscores.elements.at(i).matchId);
 		outStr.append("\n");
 		outStr.append(aux);
 		i++;

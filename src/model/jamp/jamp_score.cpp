@@ -22,7 +22,7 @@ int32 JampScore::DeserializeFromValue(Value src){
 		timeStamp = src["timeStamp"].asUInt64();
 	
 	if (!src["matchId"].empty())
-		matchId = src["matchId"].asString();
+		matchId = src["matchId"].asUInt64();
 
 	if (!src["cellsPerformance"].empty())
 		cellsPerformance.DeserializeFromValue(src["cellsPerformance"]);

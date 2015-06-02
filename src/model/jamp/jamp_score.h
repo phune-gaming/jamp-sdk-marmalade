@@ -28,7 +28,7 @@ public:
 	//Time stamp of the server (automatic)
 	int64 timeStamp;
 	//The match id (automatic)
-	std::string matchId;
+	int64 matchId;
 
 	//cells performances
 	JsonListObject<JampCellPerformance> cellsPerformance;
