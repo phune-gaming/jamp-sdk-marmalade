@@ -89,6 +89,7 @@ struct pendingRequest {
 	CIwHTTP::SendType sendType;
 	ResponseObjectType responseObjectType;
 	std::string body;
+	void *userData;
 	s3eCallback onResult;
 	s3eCallback onError;
 };
@@ -105,7 +106,7 @@ class RequestData
 {
 public:
 	RequestData(){};
-	RequestData(const char *URI, CIwHTTP *http_object, CIwHTTP::SendType sendType, s3eCallback onResult, ResponseObjectType responseObjectType, const char *body);
+	RequestData(const char *URI, CIwHTTP *http_object, CIwHTTP::SendType sendType, s3eCallback onResult, ResponseObjectType responseObjectType, const char *body, void *userData);
 	~RequestData();
 	static int32 GotHeaders(void*, void*);
 	static int32 GotData(void*, void*);
@@ -117,6 +118,7 @@ public:
 	RequestStatus requestStatus;
 	ResponseObjectType responseObjectType;
 	void* base;
+	void *userData;
 	static const char* getUri(const char *resource);
 
 };
@@ -127,17 +129,8 @@ public:
 	PhuneRestBase();
 	~PhuneRestBase();
 
-	/*
-	Store a value in server for the user in a game context (Json List). The value as a key that should be used to get/delete the data
-
-	@param gameId The game id.
-	@param key The key name.
-	@param jsonObject An object of type json. It will be deserialized in json
-	@param onResult The callback in case of success.
-	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
-	*/
 	template<class T>
-	int32 StoreGameDataJsonList(const char *gameId, const char *key, JsonListObject<T> jsonListObject, s3eCallback onResult, s3eCallback onError){
+	int32 StoreGameDataJsonList(const char *gameId, const char *key, JsonListObject<T> jsonListObject, s3eCallback onResult, s3eCallback onError, void *userData){
 		char resource[200];
 		memset(resource, 0, sizeof(resource));
 		sprintf(resource, "/jamp/me/preferences/%s?gameId=%s", key, gameId);
@@ -153,7 +146,7 @@ public:
 			pr.resource = std::string(resource);
 			pr.responseObjectType = NONE;
 			pr.sendType = CIwHTTP::PUT;
-
+			pr.userData = userData;
 			pendingRequests().push_back(pr);
 
 			return 0;
@@ -173,81 +166,36 @@ public:
 		_onResult = onResult;
 		_onError = onError;
 
-		PhuneRestBase::onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonListObject.Serialize().c_str());
+		PhuneRestBase::onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonListObject.Serialize().c_str(), userData);
 		PhuneRestBase::onGoingRequest->base = this;
 
 		return 0;
 	}
 
-	int32 GetGameDataJsonList(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError);
+	int32 GetGameDataJsonList(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError, void *userData);
 
 	int64 getCurrentTime();
 protected:
 
-	int32 _GetMe(s3eCallback onResult, s3eCallback onError);
+	int32 _GetMe(s3eCallback onResult, s3eCallback onError, void *userData);
 
-	
-	/*
-	Store a value in server for the user in a game context (Base 64). The value as a key that should be used to get/delete the data
+	int32 StoreGameDataBase64(const char *gameId, const char *key, unsigned char const* bytes, s3eCallback onResult, s3eCallback onError, void *userData);
 
-	@param gameId The game id.
-	@param key The key name.
-	@param bytes An array of bytes. The values will be encoded to base64
-	@param onResult The callback in case of success.
-	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
-	*/
-	int32 StoreGameDataBase64(const char *gameId, const char *key, unsigned char const* bytes, s3eCallback onResult, s3eCallback onError);
+	int32 StoreGameDataJson(const char *gameId, const char *key, const char* jsonObject, s3eCallback onResult, s3eCallback onError, void *userData, bool append = false);
 
-	/*
-	Store a value in server for the user in a game context (Json). The value as a key that should be used to get/delete the data
+	int32 GetGameDataBase64(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError, void *userData);
 
-	@param gameId The game id.
-	@param key The key name.
-	@param jsonObject An object of type json. It will be deserialized in json
-	@param onResult The callback in case of success.
-	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
-	*/
-	int32 StoreGameDataJson(const char *gameId, const char *key, const char* jsonObject, s3eCallback onResult, s3eCallback onError, bool append = false);
+	int32 GetGameDataJson(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError, void *userData);
 
-	
+	int32 DeleteGameData(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError, void *userData);
 
-	/*
-	Store a value in server for the user in a game context (Base 64). The value as a key that should be used to get/delete the data
+	int32 _Init(s3eCallback onResult, s3eCallback onError, void *userData);
 
-	@param gameId The game id.
-	@param key The key name.
-	@param onResult The callback in case of success.  It returns in the first paramenter an PhunePreference object.
-	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
-	*/
-	int32 GetGameDataBase64(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError);
+	int32 _Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCallback onError, void *userData);
 
-	/*
-	Store a value in server for the user in a game context (Json). The value as a key that should be used to get/delete the data
+	int32 _StartMatch(const char *gameId, s3eCallback onResult, s3eCallback onError, void *userData);
 
-	@param gameId The game id.
-	@param key The key name.
-	@param onResult The callback in case of success.  It returns in the first paramenter an JsonObject object.
-	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
-	*/
-	int32 GetGameDataJson(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError);
-
-	/*
-	Delete a value in server for the user in a game context. The value as a key that should be used to get/delete the data
-
-	@param gameId The game id.
-	@param key The key name.
-	@param onResult The callback in case of success.
-	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
-	*/
-	int32 DeleteGameData(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError);
-
-	int32 _Init(s3eCallback onResult, s3eCallback onError);
-
-	int32 _Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCallback onError);
-
-	int32 _StartMatch(const char *gameId, s3eCallback onResult, s3eCallback onError);
-
-	int32 _EndMatch(int64 matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError);
+	int32 _EndMatch(int64 matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError, void *userData);
 public:
 	
 
@@ -262,6 +210,8 @@ public:
 	static s3eCallback _onError;
 
 	int32 removeOngoingRequest();
+
+	//void *pendingUserData;
 
 protected:
 	/*
