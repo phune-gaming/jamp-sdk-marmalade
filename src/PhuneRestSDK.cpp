@@ -127,7 +127,7 @@ static int32 onGetJsonList(void *data, void*){
 
 	listOfusers.elements[1].name = std::string("José Manuel Antunes");
 
-	pr->StoreGameDataJsonList(gameId, "KEY_LISTA", listOfusers, onStoreListChange, onError);
+	pr->StoreGameDataJsonList(gameId, "KEY_LISTA", listOfusers, onStoreListChange, onError, NULL);
 
 	return 0;
 	
@@ -141,7 +141,7 @@ static int32 onStoreList(void *data, void*){
 	outStr.append(aux);
 
 	//pr->GetMeFromStore("10", onGetMeFromStore, onError);
-	pr->GetGameDataJsonList(gameId, "KEY_LISTA", onGetJsonList, onError);
+	pr->GetGameDataJsonList(gameId, "KEY_LISTA", onGetJsonList, onError, NULL);
 	
 	return 0;
 }
@@ -170,7 +170,7 @@ static int32 onResultPhuneUser(void *data, void*){
 
 	
 
-	pr->StoreGameDataJsonList(gameId, "KEY_LISTA", listOfusers, onStoreList, onError);
+	pr->StoreGameDataJsonList(gameId, "KEY_LISTA", listOfusers, onStoreList, onError, NULL);
 
 	return 0;
 }

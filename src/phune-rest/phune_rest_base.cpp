@@ -76,7 +76,7 @@ int64 PhuneRestBase::getCurrentTime(){
 	//return 0;
 }
 
-int32 PhuneRestBase::_Init(s3eCallback onResult, s3eCallback onError){
+int32 PhuneRestBase::_Init(s3eCallback onResult, s3eCallback onError, void *userData){
 
 	char resource[200];
 	std::memset(resource, 0, sizeof(resource));
@@ -86,12 +86,12 @@ int32 PhuneRestBase::_Init(s3eCallback onResult, s3eCallback onError){
 	_onError = onError;
 
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_TIMESTAMP, NULL);
+	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_TIMESTAMP, NULL, userData);
 
 	return 0;
 }
 
-int32 PhuneRestBase::_Login(s3eWebView* g_WebView,s3eCallback onResult, s3eCallback onError){
+int32 PhuneRestBase::_Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCallback onError, void *userData){
 	std::string  uri;
 
 	uri.append(URL_SCHEMA);
@@ -113,6 +113,7 @@ int32 PhuneRestBase::_Login(s3eWebView* g_WebView,s3eCallback onResult, s3eCallb
 
 	_onResult = onResult;
 	_onError = onError;
+	//pendingUserData = userData;
 
 	
 	//PhuneRestBase::onWebView = _onWebView;
@@ -149,7 +150,7 @@ int32 PhuneRestBase::_Login(s3eWebView* g_WebView,s3eCallback onResult, s3eCallb
 	return 0;
 }
 
-int32 PhuneRestBase::_GetMe(s3eCallback onResult, s3eCallback onError){
+int32 PhuneRestBase::_GetMe(s3eCallback onResult, s3eCallback onError, void *userData){
 
 	if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
 	{
@@ -159,7 +160,7 @@ int32 PhuneRestBase::_GetMe(s3eCallback onResult, s3eCallback onError){
 		pr.resource = std::string("/me");
 		pr.responseObjectType = PHUNE_USER_OBJECT;
 		pr.sendType = CIwHTTP::GET;
-
+		pr.userData = userData;
 		pendingRequests().push_back(pr);
 
 		return 0;
@@ -173,13 +174,13 @@ int32 PhuneRestBase::_GetMe(s3eCallback onResult, s3eCallback onError){
 	_onResult = onResult;
 	_onError = onError;
 	
-	onGoingRequest = new RequestData("/me", http_object, CIwHTTP::GET, GotResult, PHUNE_USER_OBJECT, NULL);
+	onGoingRequest = new RequestData("/me", http_object, CIwHTTP::GET, GotResult, PHUNE_USER_OBJECT, NULL, userData);
 
 
 	return 0;
 }
 
-int32 PhuneRestBase::StoreGameDataBase64(const char *gameId, const char *key, unsigned char const *bytes_to_encode, s3eCallback onResult, s3eCallback onError)
+int32 PhuneRestBase::StoreGameDataBase64(const char *gameId, const char *key, unsigned char const *bytes_to_encode, s3eCallback onResult, s3eCallback onError, void *userData)
 {
 	char resource[200];
 	std::memset(resource, 0, sizeof(resource));
@@ -194,7 +195,7 @@ int32 PhuneRestBase::StoreGameDataBase64(const char *gameId, const char *key, un
 		pr.resource = std::string(resource);
 		pr.responseObjectType = NONE;
 		pr.sendType = CIwHTTP::PUT;
-
+		pr.userData = userData;
 		pendingRequests().push_back(pr);
 
 		return 0;
@@ -209,12 +210,12 @@ int32 PhuneRestBase::StoreGameDataBase64(const char *gameId, const char *key, un
 	_onError = onError;
 
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, base64_encode(bytes_to_encode, strlen((char*)bytes_to_encode)).c_str());
+	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, base64_encode(bytes_to_encode, strlen((char*)bytes_to_encode)).c_str(), userData);
 
 	return 0;
 }
 
-int32 PhuneRestBase::StoreGameDataJson(const char *gameId, const char *key, const char* jsonObject, s3eCallback onResult, s3eCallback onError, bool append){
+int32 PhuneRestBase::StoreGameDataJson(const char *gameId, const char *key, const char* jsonObject, s3eCallback onResult, s3eCallback onError, void *userData, bool append){
 
 	char resource[200];
 	std::memset(resource, 0, sizeof(resource));
@@ -236,7 +237,7 @@ int32 PhuneRestBase::StoreGameDataJson(const char *gameId, const char *key, cons
 		pr.resource = std::string(resource);
 		pr.responseObjectType = NONE;
 		pr.sendType = CIwHTTP::PUT;
-
+		pr.userData = userData;
 		pendingRequests().push_back(pr);
 
 		return 0;
@@ -251,12 +252,12 @@ int32 PhuneRestBase::StoreGameDataJson(const char *gameId, const char *key, cons
 	_onError = onError;
 
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonObject);
+	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonObject, userData);
 
 	return 0;
 }
 
-int32 PhuneRestBase::GetGameDataBase64(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError)
+int32 PhuneRestBase::GetGameDataBase64(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError, void *userData)
 {
 	char resource[200];
 	std::memset(resource, 0, sizeof(resource));
@@ -270,7 +271,7 @@ int32 PhuneRestBase::GetGameDataBase64(const char *gameId, const char *key, s3eC
 		pr.resource = std::string(resource);
 		pr.responseObjectType = PHUNE_PREFERENCE_OBJECT;
 		pr.sendType = CIwHTTP::GET;
-
+		pr.userData = userData;
 		pendingRequests().push_back(pr);
 
 		return 0;
@@ -285,12 +286,12 @@ int32 PhuneRestBase::GetGameDataBase64(const char *gameId, const char *key, s3eC
 	_onError = onError;
 
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_PREFERENCE_OBJECT, NULL);
+	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_PREFERENCE_OBJECT, NULL, userData);
 
 	return 0;
 }
 
-int32 PhuneRestBase::GetGameDataJson(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError){
+int32 PhuneRestBase::GetGameDataJson(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError, void *userData){
 
 	char resource[200];
 	std::memset(resource, 0, sizeof(resource));
@@ -304,7 +305,7 @@ int32 PhuneRestBase::GetGameDataJson(const char *gameId, const char *key, s3eCal
 		pr.resource = std::string(resource);
 		pr.responseObjectType = PHUNE_PREFERENCE_JSON;
 		pr.sendType = CIwHTTP::GET;
-
+		pr.userData = userData;
 		pendingRequests().push_back(pr);
 
 		return 0;
@@ -319,12 +320,12 @@ int32 PhuneRestBase::GetGameDataJson(const char *gameId, const char *key, s3eCal
 	_onError = onError;
 
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_PREFERENCE_JSON, NULL);
+	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_PREFERENCE_JSON, NULL, userData);
 
 	return 0;
 }
 
-int32 PhuneRestBase::GetGameDataJsonList(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError){
+int32 PhuneRestBase::GetGameDataJsonList(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError, void *userData){
 
 	char resource[200];
 	std::memset(resource, 0, sizeof(resource));
@@ -338,7 +339,7 @@ int32 PhuneRestBase::GetGameDataJsonList(const char *gameId, const char *key, s3
 		pr.resource = std::string(resource);
 		pr.responseObjectType = PHUNE_PREFERENCE_JSON_LIST;
 		pr.sendType = CIwHTTP::GET;
-
+		pr.userData = userData;
 		pendingRequests().push_back(pr);
 
 		return 0;
@@ -352,12 +353,12 @@ int32 PhuneRestBase::GetGameDataJsonList(const char *gameId, const char *key, s3
 	_onResult = onResult;
 	_onError = onError;
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_PREFERENCE_JSON_LIST, NULL);
+	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_PREFERENCE_JSON_LIST, NULL, userData);
 
 	return 0;
 }
 
-int32 PhuneRestBase::DeleteGameData(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError)
+int32 PhuneRestBase::DeleteGameData(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError, void *userData)
 {
 	char resource[200];
 	std::memset(resource, 0, sizeof(resource));
@@ -371,7 +372,7 @@ int32 PhuneRestBase::DeleteGameData(const char *gameId, const char *key, s3eCall
 		pr.resource = (char*)s3eMalloc(sizeof(resource));
 		pr.resource = std::string(resource);
 		pr.sendType = CIwHTTP::DELETE;
-
+		pr.userData = userData;
 		pendingRequests().push_back(pr);
 
 		return 0;
@@ -386,12 +387,12 @@ int32 PhuneRestBase::DeleteGameData(const char *gameId, const char *key, s3eCall
 	_onError = onError;
 
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::DELETE, GotResult, NONE, NULL);
+	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::DELETE, GotResult, NONE, NULL, userData);
 
 	return 0;
 }
 
-int32 PhuneRestBase::_StartMatch(const char *gameId, s3eCallback onResult, s3eCallback onError){
+int32 PhuneRestBase::_StartMatch(const char *gameId, s3eCallback onResult, s3eCallback onError, void *userData){
 
 	
 
@@ -406,10 +407,9 @@ int32 PhuneRestBase::_StartMatch(const char *gameId, s3eCallback onResult, s3eCa
 		pr.onError = onError;
 		pr.onResult = onResult;
 		pr.resource = std::string(resource);
-
 		pr.responseObjectType = PHUNE_MATCH_OBJECT;
 		pr.sendType = CIwHTTP::POST;
-
+		pr.userData = userData;
 		pendingRequests().push_back(pr);
 
 		return 0;
@@ -423,9 +423,9 @@ int32 PhuneRestBase::_StartMatch(const char *gameId, s3eCallback onResult, s3eCa
 	_onResult = onResult;
 	_onError = onError;
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::POST, GotResult, PHUNE_MATCH_OBJECT, gameId);
+	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::POST, GotResult, PHUNE_MATCH_OBJECT, gameId, userData);
 }
-int32 PhuneRestBase::_EndMatch(int64 matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError){
+int32 PhuneRestBase::_EndMatch(int64 matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError, void *userData){
 	char resource[200];
 	std::memset(resource, 0, sizeof(resource));
 	sprintf(resource, "/jamp/matches/%d/finish", matchId);
@@ -441,7 +441,7 @@ int32 PhuneRestBase::_EndMatch(int64 matchId, PhunePlayer player, s3eCallback on
 		pr.resource = std::string(resource);
 		pr.responseObjectType = NONE;
 		pr.sendType = CIwHTTP::PUT;
-
+		pr.userData = userData;
 		pendingRequests().push_back(pr);
 
 		return 0;
@@ -455,7 +455,7 @@ int32 PhuneRestBase::_EndMatch(int64 matchId, PhunePlayer player, s3eCallback on
 	_onResult = onResult;
 	_onError = onError;
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, player.Serialize().c_str());
+	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, player.Serialize().c_str(), userData);
 
 }
 
@@ -481,7 +481,7 @@ int32 PhuneRestBase::GotResult(void *result, void *userData){
 		
 		//continue to callback
 		if (isError){
-			PhuneRestBase::_onError(result, NULL);
+			PhuneRestBase::_onError(result, requestData->userData);
 		}
 		else{
 			PhuneRestBase::_onResult(result, NULL);
@@ -510,7 +510,7 @@ int32 PhuneRestBase::GotResult(void *result, void *userData){
 			PhuneRestBase::_onResult = pr.onResult;
 			PhuneRestBase::_onError = pr.onError;
 
-			requestData = new RequestData(pr.resource.c_str(), httpObject, pr.sendType, GotResult, pr.responseObjectType, pr.body.c_str());
+			requestData = new RequestData(pr.resource.c_str(), httpObject, pr.sendType, GotResult, pr.responseObjectType, pr.body.c_str(), pr.userData);
 		}
 	}
 	return 0;
@@ -550,7 +550,7 @@ int32 PhuneRestBase::_onHideWebView(s3eWebView *instance, void *systemData, void
 
 		s3eWebViewUnRegister(S3E_WEBVIEW_FINISHED_LOADING, _onHideWebView, instance);
 
-		object->onGoingRequest = new RequestData(out.c_str(), object->http_object, CIwHTTP::GET, object->GotResult, PHUNE_REDIRECT_LOGIN, NULL);
+		object->onGoingRequest = new RequestData(out.c_str(), object->http_object, CIwHTTP::GET, object->GotResult, PHUNE_REDIRECT_LOGIN, NULL, NULL);
 
 		
 	}
@@ -564,12 +564,13 @@ int32 PhuneRestBase::_onHideWebView(s3eWebView *instance, void *systemData, void
 //-----------------------------------------------------------------------------
 // From request data
 //-----------------------------------------------------------------------------
-RequestData::RequestData(const char *resource, CIwHTTP *http_object, CIwHTTP::SendType sendType, s3eCallback onResult, ResponseObjectType responseObjectType, const char *body)
+RequestData::RequestData(const char *resource, CIwHTTP *http_object, CIwHTTP::SendType sendType, s3eCallback onResult, ResponseObjectType responseObjectType, const char *body, void *userData)
 {
 	this->requestStatus = ONGOING_REQUEST;
 	this->responseObjectType = responseObjectType;
 	this->onResult = onResult;
 	this->http_object = http_object;
+	this->userData = userData;
 
 	this->result = NULL;
 
@@ -710,7 +711,7 @@ int32 RequestData::GotData(void*, void *userData)
 	if (requestData->http_object->GetStatus() == S3E_RESULT_ERROR || requestData->http_object->GetResponseCode()>=400)
 	{
 		requestData->requestStatus = REQUEST_ERROR;
-		requestData->onResult(new RequestError(REQUEST_ERROR, requestData->http_object->GetResponseCode()), requestData);
+		requestData->onResult(new RequestError(REQUEST_ERROR, requestData->http_object->GetResponseCode()), requestData->userData);
 	}
 	else if (requestData->http_object->ContentReceived() != requestData->http_object->ContentExpected())
 	{

@@ -34,8 +34,9 @@ public:
 
 	@param onResult The callback in case of success.
 	@param onError The callback in case of error.
+	@param userData The object to be received on callback.
 	*/
-	int32 Init(s3eCallback onResult, s3eCallback onError);
+	int32 Init(s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 
 	/*
 	Do the Login (Facebook)
@@ -43,16 +44,18 @@ public:
 	@param g_WebView The Web view created by the UI.
 	@param onResult The calbacks during the login. It sends a int* in data as WebViewRequestStatus: LOADING->The web page is loading; HIDE_VIEW->It should hide the Web view; STOP_VIEW->It should close/kill the Web view; FINISHED->The Login process is completed. It should ask for "GetMe" to obtain the new user.
 	@param onError The callback in case of error.
+	@param userData The object to be received on callback.
 	*/
-	int32 Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCallback onError);
+	int32 Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 	
 	/*
 	Get my Phune User or create one. It puts the user in the session.
 
 	@param onResult The callback in case of success. It returns in the first paramenter an PhuneUser object.
 	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
+	@param userData The object to be received on callback.
 	*/
-	int32 GetMe(s3eCallback onResult, s3eCallback onError);
+	int32 GetMe(s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 
 	/*
 	Inform that a match has been started. In return it will be retruned a match id to be used when storing a core of a match
@@ -60,8 +63,9 @@ public:
 	@param gameId The game id.
 	@param onResult The callback in case of success. It returns in the first paramenter a match id as a char*.
 	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
+	@param userData The object to be received on callback.
 	*/
-	int32 StartMatch(JampGameId gameId, s3eCallback onResult, s3eCallback onError);
+	int32 StartMatch(JampGameId gameId, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 
 	/*
 	Inform that a match has been completed a to store the performace of the match. It will store the matches performances.
@@ -73,8 +77,9 @@ public:
 	@param onResult The callback in case of success.
 	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
 	@param pack (Optional) pack information after match (if any changes occurred).
+	@param userData The object to be received on callback.
 	*/
-	int32 EndMatch(JampGameId gameId, int64 level, JampScore score, PlayerStatus status, s3eCallback onResult, s3eCallback onError);
+	int32 EndMatch(JampGameId gameId, int64 level, JampScore score, PlayerStatus status, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 
 	/*
 	Get the historical data for level in Game.
@@ -83,8 +88,9 @@ public:
 	@param level The level of the match
 	@param onResult The callback in case of success. Return a list of JampScore 
 	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
+	@param userData The object to be received on callback.
 	*/
-	int32 GetHistoricScoreForLevelInGame(JampGameId gameId, const char *level, s3eCallback onResult, s3eCallback onError);
+	int32 GetHistoricScoreForLevelInGame(JampGameId gameId, const char *level, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 
 	/*
 	Stores a pack in Game.
@@ -93,8 +99,9 @@ public:
 	@param pack The pack,
 	@param onResult The callback in case of success.
 	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
+	@param userData The object to be received on callback.
 	*/
-	int32 StorePackInfoInGame(JampGameId gameId, JampPack pack, s3eCallback onResult, s3eCallback onError);
+	int32 StorePackInfoInGame(JampGameId gameId, JampPack pack, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 
 	/*
 	Get pack info in Game.
@@ -103,8 +110,9 @@ public:
 	@param packId The pack id
 	@param onResult The callback in case of success. Return a JampPack.
 	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
+	@param userData The object to be received on callback.
 	*/
-	int32 GetPackInfoInGame(JampGameId gameId, int64 packId, s3eCallback onResult, s3eCallback onError);
+	int32 GetPackInfoInGame(JampGameId gameId, int64 packId, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 
 	/*
 	Stores the list of packs in Game.
@@ -113,8 +121,9 @@ public:
 	@param pack The List of packs,
 	@param onResult The callback in case of success.
 	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
+	@param userData The object to be received on callback.
 	*/
-	int32 StorePacksInGame(JampGameId gameId, JsonListObject<JampPack> packs, s3eCallback onResult, s3eCallback onError);
+	int32 StorePacksInGame(JampGameId gameId, JsonListObject<JampPack> packs, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 
 	/*
 	Get list of packs in Game.
@@ -123,13 +132,11 @@ public:
 	@param packId The pack id
 	@param onResult The callback in case of success. Return a JsonListObject<JampPack> packs.
 	@param onError The callback in case of error. It returns in the first paramenter an RequestError object.
+	@param userData The object to be received on callback.
 	*/
-	int32 GetPacksInGame(JampGameId gameId, s3eCallback onResult, s3eCallback onError);
+	int32 GetPacksInGame(JampGameId gameId, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 
 
 };
-
-//s3eCallback PhuneRestBase::_onResult;
-//s3eCallback PhuneRestBase::_onError;
 
 #endif // !PHUNE_REST_JAMP
