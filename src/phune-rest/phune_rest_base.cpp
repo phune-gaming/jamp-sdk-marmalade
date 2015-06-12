@@ -604,7 +604,8 @@ RequestData::RequestData(const char *resource, CIwHTTP *http_object, CIwHTTP::Se
 RequestData::~RequestData()
 {
 	if (http_object != NULL)
-		http_object->Cancel();
+		if (!http_object->ContentFinished())
+			http_object->Cancel();
 
 	try{
 		if (result && result != NULL)
