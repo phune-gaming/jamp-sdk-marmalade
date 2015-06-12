@@ -63,6 +63,7 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore sc
 	for (std::vector<JampCellPerformance>::iterator it = score.cellsPerformance.elements.begin(); it != score.cellsPerformance.elements.end(); it++){
 		char buffer4[50];
 		sprintf(buffer4, "%s%lld", CELL_PERFORMACE_PREFIX, it->cellId);
+
 		std::string key_cell = std::string(buffer4);
 		it->timeStamp = t;
 		PhuneRestBase::StoreGameDataJson(s.c_str(), key_cell.c_str(), it->Serialize().c_str(), onNullReturn, onError, userData, true);
