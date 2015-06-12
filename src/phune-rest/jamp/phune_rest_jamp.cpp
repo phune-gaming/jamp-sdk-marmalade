@@ -33,7 +33,7 @@ int32 PhuneRestJamp::StartMatch(JampGameId gameId, s3eCallback onResult, s3eCall
 	return PhuneRest::StartMatch(s.c_str(), onStartMatchReturn, onError, userData);
 }
 
-int32 PhuneRestJamp::EndMatch(JampGameId gameId, int64 level, JampScore score, PlayerStatus status, s3eCallback onResult, s3eCallback onError, void *userData){
+int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore score, PlayerStatus status, s3eCallback onResult, s3eCallback onError, void *userData){
 	if (currentMatch == NULL){
 		onError(NULL, NULL);
 		return 0;
@@ -42,10 +42,8 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, int64 level, JampScore score, P
 	sprintf(buffer, "%d", gameId);
 	std::string s = std::string(buffer);
 
-
-	char buffer3[50];
-	sprintf(buffer3, "%s%d", SCORE_LEVEL_KEY_PREFIX, level);
-	std::string s3 = std::string(buffer3);
+	std::string s3 = std::string(SCORE_LEVEL_KEY_PREFIX);
+	s3.append(level);
 
 	
 	score.matchId = currentMatch->matchId;

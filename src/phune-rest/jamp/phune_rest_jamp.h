@@ -78,7 +78,7 @@ public:
 	@param pack (Optional) pack information after match (if any changes occurred).
 	@param userData The object to be received on callback.
 	*/
-	int32 EndMatch(JampGameId gameId, int64 level, JampScore score, PlayerStatus status, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
+	int32 EndMatch(JampGameId gameId, std::string level, JampScore score, PlayerStatus status, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 
 	/*
 	Get the historical data for level in Game.

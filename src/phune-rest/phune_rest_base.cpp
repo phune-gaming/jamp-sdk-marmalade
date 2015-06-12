@@ -785,8 +785,6 @@ int32 RequestData::GotData(void*, void *userData)
 			break;
 		}
 
-
-
 	}
 	return 0;
 }
