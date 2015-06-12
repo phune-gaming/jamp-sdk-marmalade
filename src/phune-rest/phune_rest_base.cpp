@@ -111,9 +111,11 @@ int32 PhuneRestBase::_Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCall
 		onGoingRequest = NULL;
 	}
 
+	onGoingRequest->userData = userData;
+
 	_onResult = onResult;
 	_onError = onError;
-	//pendingUserData = userData;
+	pendingUserData = userData;
 
 	
 	//PhuneRestBase::onWebView = _onWebView;
@@ -127,7 +129,7 @@ int32 PhuneRestBase::_Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCall
 	case S3E_RESULT_ERROR:
 	default:
 		IwTrace(PHUNE, ("ERROR ON REGISTER"));
-		onError(NULL, NULL);
+		onError(NULL, userData);
 		return 0;
 	}
 
@@ -137,11 +139,11 @@ int32 PhuneRestBase::_Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCall
 	switch (result2)
 	{
 	case S3E_RESULT_SUCCESS:
-		onResult(&tmp, NULL);
+		onResult(&tmp, userData);
 		break;
 	case S3E_RESULT_ERROR:
 	default:
-		onError(NULL, NULL);
+		onError(NULL, userData);
 		return 0;
 	}
 
@@ -484,7 +486,7 @@ int32 PhuneRestBase::GotResult(void *result, void *userData){
 			PhuneRestBase::_onError(result, requestData->userData);
 		}
 		else{
-			PhuneRestBase::_onResult(result, NULL);
+			PhuneRestBase::_onResult(result, requestData->userData);
 		}
 		requestData->requestStatus = READY;
 		delete requestData;
@@ -528,7 +530,7 @@ int32 PhuneRestBase::_onHideWebView(s3eWebView *instance, void *systemData, void
 		IwTrace(PHUNE, ("PhuneRestBase::onHideWebView Found login Redirect:%s", out.c_str()));
 		
 		int tmp = STOP_VIEW;
-		_onResult(&tmp, NULL);
+		_onResult(&tmp, object->pendingUserData);
 
 		std::string prefix = string();
 
@@ -550,7 +552,7 @@ int32 PhuneRestBase::_onHideWebView(s3eWebView *instance, void *systemData, void
 
 		s3eWebViewUnRegister(S3E_WEBVIEW_FINISHED_LOADING, _onHideWebView, instance);
 
-		object->onGoingRequest = new RequestData(out.c_str(), object->http_object, CIwHTTP::GET, object->GotResult, PHUNE_REDIRECT_LOGIN, NULL, NULL);
+		object->onGoingRequest = new RequestData(out.c_str(), object->http_object, CIwHTTP::GET, object->GotResult, PHUNE_REDIRECT_LOGIN, NULL, object->pendingUserData);
 
 		
 	}

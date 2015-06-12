@@ -211,7 +211,7 @@ public:
 
 	int32 removeOngoingRequest();
 
-	//void *pendingUserData;
+	void *pendingUserData;
 
 protected:
 	/*
