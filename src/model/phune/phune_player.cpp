@@ -13,6 +13,9 @@ PhunePlayer::~PhunePlayer()
 
 int32 PhunePlayer::Deserialize(std::string jsonSrc)
 {
+	if (jsonSrc.length() == 0)
+		return 0;
+	
 	Reader reader;
 	Value value;
 
