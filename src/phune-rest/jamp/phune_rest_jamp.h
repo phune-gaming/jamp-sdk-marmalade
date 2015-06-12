@@ -18,12 +18,12 @@
 enum JampGameId
 {
 	PLATFORM = -1,
-	RHYTHM = 1000,
-	//Conhecimento teclado
-	//Esclas e harpejos
-	// 5notas
-	//1ª vista
-	REPERTOIRE = 30
+	RHYTHM = 1000, //Jogo do ritmo
+	KEYBOARD = 1010, //Conhecimento teclado
+	SCALE = 1020, //Esclas e harpejos
+	FIVE_NOTES = 1030, // 5notas
+	FIRST_SIGHT = 1040, //1ª vista
+	REPERTOIRE = 1050 // Repertório
 };
 
 class PhuneRestJamp : public PhuneRest
