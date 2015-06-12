@@ -22,7 +22,7 @@ public:
 	virtual int32 DeserializeFromValue(Value src) override;
 public:
 	//The id of the cell
-	std::string cellId;
+	int64 cellId;
 	//classification of the cell
 	ClassificationType classification;
 	//notes performance

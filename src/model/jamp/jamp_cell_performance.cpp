@@ -14,7 +14,7 @@ int32 JampCellPerformance::Deserialize(std::string jsonSrc)
 int32 JampCellPerformance::DeserializeFromValue(Value src){
 
 	if (!src["cellId"].empty())
-		cellId = src["cellId"].asString();
+		cellId = src["cellId"].asInt64();
 
 	if (!src["classification"].empty()){
 		std::string classificationStr = src["classification"].asString();
