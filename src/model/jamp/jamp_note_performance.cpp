@@ -3,6 +3,9 @@
 
 int32 JampNotePerformance::Deserialize(std::string jsonSrc)
 {
+	if (jsonSrc.length() == 0)
+		return 0;
+
 	Reader reader;
 	Value value;
 

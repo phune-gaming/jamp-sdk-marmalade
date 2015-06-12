@@ -25,6 +25,10 @@ T const& JsonListObject<T>::top() const
 template <class T>
 int32 JsonListObject<T>::Deserialize(std::string jsonSrc)
 {
+
+	if(jsonSrc.length() == 0)
+		return 0;
+
 	Json::Reader reader;
 	Json::Value root;
 

@@ -12,6 +12,10 @@ PhunePreferenceBase64::~PhunePreferenceBase64()
 
 int32 PhunePreferenceBase64::Deserialize(std::string jsonSrc)
 {
+
+	if (jsonSrc.length() == 0)
+		return 0;
+
 	Reader reader;
 	Value jsonValue;
 

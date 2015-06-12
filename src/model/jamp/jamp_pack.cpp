@@ -3,6 +3,9 @@
 
 int32 JampPack::Deserialize(std::string jsonSrc)
 {
+	if (jsonSrc.length() == 0)
+		return 0;
+
 	Reader reader;
 	Value value;
 
