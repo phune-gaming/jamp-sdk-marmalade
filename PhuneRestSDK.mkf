@@ -1,0 +1,46 @@
+#!/usr/bin/env mkb
+files
+{
+	#Phune rest
+	["src/phune-rest"]
+	(src/phune-rest)
+	"*.cpp"
+	"*.h"
+
+	#Model Generic
+	["src/model"]
+	(src/model)
+	"*.tpp"
+	"*.cpp"
+	"*.h"	
+	
+	#Model Phune
+	["src/model/phune"]
+	(src/model/phune)
+	"*.cpp"
+	"*.h"
+
+	#Rest JAMP
+	["src/phune-rest/jamp"]
+	(src/phune-rest/jamp)
+	"*.cpp"
+	"*.h"
+	
+	#Model JAMP
+	["src/model/jamp"]
+	(src/model/jamp)
+	"*.cpp"
+	"*.h"
+}
+
+subprojects
+{
+	iwutil
+	jsoncpp
+	iwhttp
+	s3eWebView
+}
+
+deployment
+{
+}
