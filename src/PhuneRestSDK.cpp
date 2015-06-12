@@ -208,7 +208,7 @@ static int32 onMatchId(void *data, void*){
 	notePerformance.noteTime = 1000;
 
 	JampCellPerformance cellPerformace;
-	cellPerformace.cellId = "IDDEUMACELULA";
+	cellPerformace.cellId = 25;
 	cellPerformace.classification = GOOD;
 		
 	cellPerformace.notesPerformance.pushElement(notePerformance);
@@ -229,7 +229,7 @@ static int32 onMatchId(void *data, void*){
 	pack->starsWon = 11;
 
 	//pr->EndMatch(matchId, pp, onEndMatch, onError);
-	pr->EndMatch(RHYTHM, 1, score, WINNER, onEndMatch, onError);
+	pr->EndMatch(RHYTHM, "1", score, WINNER, onEndMatch, onError);
 
 	//pr->GetMe(onResultPhuneUser, onError);
 
