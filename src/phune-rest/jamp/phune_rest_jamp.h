@@ -23,7 +23,6 @@ enum JampGameId
 	SCALE = 1020, //Esclas e harpejos
 	FIVE_NOTES = 1030, // 5notas
 	FIRST_SIGHT = 1040, //1ª vista
-	REPERTOIRE = 1050 // Repertório
 };
 
 class PhuneRestJamp : public PhuneRest
