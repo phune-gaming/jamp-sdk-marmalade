@@ -605,6 +605,9 @@ RequestData::RequestData(const char *resource, CIwHTTP *http_object, CIwHTTP::Se
 
 RequestData::~RequestData()
 {
+	//FIXME Prego empurrra com a barriga
+	return;
+
 	if (http_object != NULL)
 		if (!http_object->ContentFinished())
 			http_object->Cancel();
