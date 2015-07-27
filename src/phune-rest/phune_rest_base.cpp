@@ -620,7 +620,7 @@ RequestData::~RequestData()
 		}
 	}
 	catch (int e){
-
+		IwTrace(PHUNE, ("On catch of destructor of RequestData"));
 	}
 	
 }
@@ -635,13 +635,14 @@ int32 RequestData::GotHeaders(void*, void *userData)
 
 	IwTrace(PHUNE, ("on got headers INIT"));
 	
-	if (requestData->http_object->GetStatus() == S3E_RESULT_ERROR || requestData->http_object->GetResponseCode() >= 400)
+	if (requestData->http_object->GetStatus() == S3E_RESULT_ERROR || requestData->http_object->GetResponseCode() >= 400 || requestData->http_object->GetResponseCode() == 0)
 	{
 		IwTrace(PHUNE, ("on got headers ERROR"));
 		requestData->requestStatus = REQUEST_ERROR;
 		requestData->onResult(new RequestError(REQUEST_ERROR, requestData->http_object->GetResponseCode()), requestData);
 		return 0;
 	}
+	
 	if (requestData->responseObjectType == NONE || requestData->http_object->GetResponseCode() == 204){
 		IwTrace(PHUNE, ("on got headers NONE or No content"));
 		requestData->onResult(NULL, requestData);
@@ -756,33 +757,44 @@ int32 RequestData::GotData(void*, void *userData)
 		switch (requestData->responseObjectType)
 		{
 		case PHUNE_USER_OBJECT:
+			IwTrace(PHUNE, ("Received data. Parsing PHUNE_USER_OBJECT"));
 			pu = new PhuneUser();
 			pu->Deserialize(std::string(requestData->result));
+			IwTrace(PHUNE, ("Received data. Parsed PHUNE_USER_OBJECT"));
 			requestData->onResult(pu, requestData);
 			break;
 		case PHUNE_PREFERENCE_OBJECT:
+			IwTrace(PHUNE, ("Received data. Parsing PHUNE_PREFERENCE_OBJECT"));
 			ppb = new PhunePreferenceBase64();
 			ppb->Deserialize(std::string(requestData->result));
+			IwTrace(PHUNE, ("Received data. Parsed PHUNE_PREFERENCE_OBJECT"));
 			requestData->onResult(ppb, requestData);
 			break;
 		case PHUNE_PREFERENCE_JSON:
 		case PHUNE_PREFERENCE_JSON_LIST:
+			IwTrace(PHUNE, ("Received data. Parsing PHUNE_PREFERENCE_JSON or PHUNE_PREFERENCE_JSON_LIST"));
 			pp = new PhunePreference();
 			pp->Deserialize(std::string(requestData->result));
+			IwTrace(PHUNE, ("Received data. Parsed PHUNE_PREFERENCE_JSON or PHUNE_PREFERENCE_JSON_LIST"));
 			requestData->onResult(pp, requestData);
 			break;
 		case PHUNE_TIMESTAMP:
+			IwTrace(PHUNE, ("Received data PHUNE_TIMESTAMP"));
 			requestData->onResult(requestData->result, requestData);
 			break;
 		case PHUNE_MATCH_OBJECT:
+			IwTrace(PHUNE, ("Received data. Parsing PHUNE_MATCH_OBJECT"));
 			pm = new PhuneMatch();
 			pm->Deserialize(std::string(requestData->result));
+			IwTrace(PHUNE, ("Received data. Parsed PHUNE_MATCH_OBJECT"));
 			requestData->onResult(pm, requestData);
 			break;
 		case PHUNE_REDIRECT_LOGIN:
+			IwTrace(PHUNE, ("Received data PHUNE_REDIRECT_LOGIN"));
 			requestData->onResult(&tmp, requestData);
 			break;
 		default:
+			IwTrace(PHUNE, ("Received data default"));
 			requestData->requestStatus = REQUEST_ERROR;
 			requestData->onResult(new RequestError(INVALID_RESPONSE_OBJECT, 0), requestData);
 			break;
