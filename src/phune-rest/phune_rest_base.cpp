@@ -635,13 +635,14 @@ int32 RequestData::GotHeaders(void*, void *userData)
 
 	IwTrace(PHUNE, ("on got headers INIT"));
 	
-	if (requestData->http_object->GetStatus() == S3E_RESULT_ERROR || requestData->http_object->GetResponseCode() >= 400)
+	if (requestData->http_object->GetStatus() == S3E_RESULT_ERROR || requestData->http_object->GetResponseCode() >= 400 || requestData->http_object->GetResponseCode() == 0)
 	{
 		IwTrace(PHUNE, ("on got headers ERROR"));
 		requestData->requestStatus = REQUEST_ERROR;
 		requestData->onResult(new RequestError(REQUEST_ERROR, requestData->http_object->GetResponseCode()), requestData);
 		return 0;
 	}
+	
 	if (requestData->responseObjectType == NONE || requestData->http_object->GetResponseCode() == 204){
 		IwTrace(PHUNE, ("on got headers NONE or No content"));
 		requestData->onResult(NULL, requestData);
