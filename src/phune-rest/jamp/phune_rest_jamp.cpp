@@ -57,17 +57,58 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore sc
 	//Send the result of the match
 	PhuneRest::EndMatch(score.matchId, player, onNullReturn, onError);
 
-	
+    IwTrace(PHUNE, ("Creating map begin"));
+    std::map<int64, JsonListObject<JsonString> > map;
+	//aggregate cells performance
+    for (std::vector<JampCellPerformance>::iterator it = score.cellsPerformance.elements.begin(); it != score.cellsPerformance.elements.end(); it++){
+        
+        //found
+        if (map.find(it->cellId) == map.end()) {
+            JsonListObject<JsonString> list;
+            it->timeStamp = t;
+            JsonString js;
+            js.Deserialize(it->Serialize());
+            list.pushElement(js);
+            map.insert(std::make_pair(it->cellId,list));
+        }
+        else {
+            it->timeStamp = t;
+            std::string aux2;
+            JsonString js2;
+            js2.Deserialize(it->Serialize());
+            map.find(it->cellId)->second.pushElement(js2);
+        }
+    }
+    IwTrace(PHUNE, ("Creating map end"));
+    IwTrace(PHUNE, ("Sending cells begin"));
+    //store the Cell performances
+    for (std::map<int64, JsonListObject<JsonString> >::iterator itMap = map.begin(); itMap != map.end(); itMap++){
+        
+        char buffer4[50];
+        sprintf(buffer4, "%s%lld", CELL_PERFORMACE_PREFIX, itMap->first);
+        std::string key_cell = std::string(buffer4);
+        
+        std::string out = itMap->second.Serialize();
+        
+        IwTrace(PHUNE, ("Sending cell %lld begin", itMap->first));
+        
+        PhuneRestBase::StoreGameDataJsonBatch(s.c_str(), key_cell.c_str(), itMap->second.Serialize().c_str(), onNullReturn, onError, userData, true);
+        
+        IwTrace(PHUNE, ("Sending cell %lld end", itMap->first));
+    
+    }
+    IwTrace(PHUNE, ("Sending cells end"));
+    
 
 	//store the Cell performances
-	for (std::vector<JampCellPerformance>::iterator it = score.cellsPerformance.elements.begin(); it != score.cellsPerformance.elements.end(); it++){
+	/*for (std::vector<JampCellPerformance>::iterator it = score.cellsPerformance.elements.begin(); it != score.cellsPerformance.elements.end(); it++){
 		char buffer4[50];
 		sprintf(buffer4, "%s%lld", CELL_PERFORMACE_PREFIX, it->cellId);
 
 		std::string key_cell = std::string(buffer4);
 		it->timeStamp = t;
 		PhuneRestBase::StoreGameDataJson(s.c_str(), key_cell.c_str(), it->Serialize().c_str(), onNullReturn, onError, userData, true);
-	}
+	}*/
 
 	//store the score for the match
 	score.timeStamp = t;
@@ -75,7 +116,6 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore sc
 	
 	//TODO send the events
 
-	delete currentMatch;
 	currentMatch = NULL;
 
 	return 0;

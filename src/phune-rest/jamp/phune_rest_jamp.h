@@ -6,9 +6,11 @@
 #include "../../model/jamp/jamp_score.h"
 #include "../../model/jamp/jamp_pack.h"
 #include "../../model/json_list_object.h"
+#include "../../model/json_string.h"
 #include "../../model/phune/phune_match.h"
 
 #include <stdlib.h>
+#include <map>
 
 #define SCORE_LEVEL_KEY_PREFIX "SCORE_"
 #define CELL_PERFORMACE_PREFIX "CELL_"

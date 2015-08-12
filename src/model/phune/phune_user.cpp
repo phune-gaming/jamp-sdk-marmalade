@@ -44,7 +44,7 @@ int32 PhuneUser::DeserializeFromValue(Json::Value src){
 		else if (genderStr.compare("FEMALE") == 0)
 			gender = FEMALE;
 		else
-			gender = UNKNOWN;
+			gender = G_UNKNOWN;
 	}
 
 	if (!src["name"].empty())
@@ -99,7 +99,7 @@ Value PhuneUser::SerializeToValue(){
 	case FEMALE:
 		root["gender"] = "FEMALE";
 		break;
-	case UNKNOWN:
+	case G_UNKNOWN:
 	default:
 		root["gender"] = "UNKNOWN";
 		break;

@@ -27,8 +27,12 @@ public:
 	int64 maxScore;
 
 	//level blocked
-
 	bool blocked;
+    
+    bool grouping;
+    
+    int64 packId;
+
 };
 
 #endif // !JAMP_PACK_LEVEL

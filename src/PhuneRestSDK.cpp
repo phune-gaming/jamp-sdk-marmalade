@@ -4,7 +4,7 @@
 #include <string>
 #include <clocale>
 #include "s3eWebView.h"
-#include "IwUtil.h"
+#include <IwUtil.h>
 
 static PhuneRestJamp *pr;
 static std::string outStr;
@@ -221,6 +221,74 @@ static int32 onMatchId(void *data, void*){
 
 	score.cellsPerformance.pushElement(cellPerformace);
 	score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    
+    cellPerformace.cellId = 30;
+    cellPerformace.classification = BAD;
+    
+    
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    
+    
 
 	JampPack *pack = new JampPack();
 	pack->packId = 2;
@@ -252,11 +320,15 @@ static int32 onMe(void *data, void*){
 	return 0;
 }
 
+
+
 static int32 onWebView(void *data, void*){
 	IW_CALLSTACK("PhuneRestSDK::onWebView");
 	IwTrace(PHUNE, ("onWebView"));
 	int *result = static_cast<int*>(data);
 
+    int32 width = s3eWebViewGetHandleProperty(g_WebView, S3E_WEBVIEW_WIDTH);
+    
 	char aux[100];
 	switch (*result)
 	{
@@ -276,11 +348,13 @@ static int32 onWebView(void *data, void*){
 		sprintf(aux, "`x000000[%lld]On WebView STOP_VIEW!!", pr->getCurrentTime());
 		break;
 	case FINISHED:
+            
 		IwTrace(PHUNE, ("onWebView FINISHED"));
 		sprintf(aux, "`x000000[%lld]On WebView FINISHED!!", pr->getCurrentTime());
 
 		//Calling a new me :) after login
 		pr->GetMe(onMe, onError);
+        //pr->GetPacksInGame(RHYTHM, onPack, onError);
 		break;
 	default:
 		IwTrace(PHUNE, ("onWebView default"));
@@ -312,13 +386,61 @@ static int32 onMeAfterInit(void *data, void*){
 		if (phuneUser->type == UNREGISTERED){
 
 			g_WebView = s3eWebViewCreate();
+            
+            s3eWebViewShow(g_WebView, 0, 0, 0, 0);
 
-			s3eWebViewShow(g_WebView, 10, 100, s3eSurfaceGetInt(S3E_SURFACE_WIDTH) - 20, s3eSurfaceGetInt(S3E_SURFACE_HEIGHT) - 110);
+            //s3eWebViewSetHandleProperty(g_WebView, S3E_WEBVIEW_SCROLLING,1);
+			
 			pr->Login(g_WebView, onWebView, onError);
+            
+            
+            
+           
+            
+            //FacebookSDK fb;
+            //fb.Login(NULL, NULL);
 		}
 	}
 
 	return 0;
+}
+
+static int32 onStorePack(void *data, void*){
+    char aux[100];
+    sprintf(aux, "`x000000[%lld]On stored pack!!", pr->getCurrentTime());
+    
+    outStr.append("\n");
+    outStr.append(aux);
+    
+    return 0;
+}
+
+static int32 onPack(void *data, void*){
+    char aux[100];
+    
+    if(data == NULL){
+        sprintf(aux, "`x000000[%lld]On Pack empty!!", pr->getCurrentTime());
+        
+        pr->Login(g_WebView, onWebView, onError);
+    }
+    else{
+        sprintf(aux, "`x000000[%lld]On Pack with content!!", pr->getCurrentTime());
+        PhunePreference *phunePreference = static_cast<PhunePreference*>(data);
+        JsonListObject<JampPack> packs;
+        
+        IwTrace(PHUNE, ("Received Pack content:%s", phunePreference->value.c_str()));
+        
+        packs.Deserialize(phunePreference->value);
+        
+        
+        pr->StorePacksInGame(RHYTHM, packs, onStorePack, onError);
+    }
+    
+    outStr.append("\n");
+    outStr.append(aux);
+
+    
+    return 0;
 }
 
 static int32 onInit(void *data, void*){
@@ -328,6 +450,11 @@ static int32 onInit(void *data, void*){
 	outStr.append("\n");
 	outStr.append(aux);
 
+    JampPack jp;
+    
+    
+    pr->GetPacksInGame(RHYTHM, onPack, onError);
+    //pr->StorePackInfoInGame(PLATFORM, <#JampPack pack#>, <#s3eCallback onResult#>, <#s3eCallback onError#>)
 
 
 	//pr->GetMe(onMeAfterInit, onError);
@@ -345,7 +472,7 @@ static int32 onGetScore(void *data, void*){
 	char aux[100];
 	unsigned int i = 0;
 	while (i < listOfscores.elements.size()){
-		sprintf(aux, "`x000000[%lld]I have points %lld in match %d", pr->getCurrentTime(), listOfscores.elements.at(i).score, listOfscores.elements.at(i).matchId);
+		sprintf(aux, "`x000000[%lld]I have points %lld in match %lld", pr->getCurrentTime(), listOfscores.elements.at(i).score, listOfscores.elements.at(i).matchId);
 		outStr.append("\n");
 		outStr.append(aux);
 		i++;
@@ -374,7 +501,7 @@ int main()
 
 	
 
-	pr->StartMatch(RHYTHM, onMatchId, onError);
+	//pr->StartMatch(RHYTHM, onMatchId, onError);
 	//pr->GetScoreForMatch("1000", "1", onGetScore, onError);
 
 	//pr->StartMatch(gameId, onMatchId, onError);
@@ -389,7 +516,6 @@ int main()
 		s3eKeyboardUpdate();
 		s3ePointerUpdate();
 
-
 		s3eSurfaceClear(255, 255, 255);
 
 		// Print a line of debug text to the screen at top left (0,0)
@@ -400,7 +526,6 @@ int main()
 
 		// Flip the surface buffer to screen
 		s3eSurfaceShow();
-
 		
 
 		// Sleep for 0ms to allow the OS to process events etc.

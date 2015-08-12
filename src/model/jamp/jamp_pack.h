@@ -29,6 +29,12 @@ public:
 	int64 starsMax;
 	//Pack blocked
 	bool blocked;
+    
+    std::string figurationFlag;
+    std::string figurationInfo;
+    std::string name;
+    int64 numBlueStarsToUnlock;
+    std::string timeUnit;
 
 	//cells performances (ordered)
 	JsonListObject<JampPackLevel> packLevels;
