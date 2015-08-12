@@ -2,3 +2,12 @@ data/
 data-ram/
 project_PhuneRestSDK/
 build_phunerestsdk_vc12/
+run_PhuneRestSDK.py
+run_PhuneRestSDK_amd64.py
+run_PhuneRestSDK_qemu.py
+build_phunerestsdk_scons_aarch64
+build_phunerestsdk_scons_arm
+build_phunerestsdk_scons_mips
+build_phunerestsdk_scons_naclx86_64
+build_phunerestsdk_scons_x86
+build_phunerestsdk_xcode
