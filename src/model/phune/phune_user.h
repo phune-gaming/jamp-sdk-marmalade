@@ -16,7 +16,7 @@ enum RegisterType
 
 enum Gender
 {
-	UNKNOWN,
+	G_UNKNOWN,
 	MALE,
 	FEMALE
 };
