@@ -693,7 +693,9 @@ int32 RequestData::GotHeaders(void*, void *userData)
 	
 	if (requestData->responseObjectType == NONE || requestData->http_object->GetResponseCode() == 204){
 		IwTrace(PHUNE, ("on got headers NONE or No content"));
-		requestData->onResult(NULL, requestData);
+        requestData->requestStatus = NO_CONTENT;
+        requestData->onResult(NULL, requestData);
+        return 0;
 	}
 	else
 	{
@@ -801,7 +803,11 @@ int32 RequestData::GotData(void*, void *userData)
 
 		int tmp = FINISHED;
 
-
+        if(requestData->requestStatus == NO_CONTENT)
+        {
+            IwTrace(PHUNE, ("Received data. NO_CONTENT"));
+            requestData->onResult(NULL, requestData);
+        }
 		switch (requestData->responseObjectType)
 		{
 		case PHUNE_USER_OBJECT:
