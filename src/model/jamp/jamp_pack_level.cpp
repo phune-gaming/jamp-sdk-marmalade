@@ -24,9 +24,14 @@ int32 JampPackLevel::DeserializeFromValue(Value src){
 	if (!src["maxScore"].empty())
 		maxScore = src["maxScore"].asUInt64();
 	
-	
 	if (!src["blocked"].empty())
 		blocked = src["blocked"].asBool();
+    
+    if (!src["grouping"].empty())
+        grouping = src["grouping"].asBool();
+    
+    if (!src["packId"].empty())
+        packId = src["packId"].asInt64();
 
 	return 0;
 }
@@ -44,6 +49,8 @@ Value JampPackLevel::SerializeToValue(){
 	root["starsWon"] = starsWon;
 	root["maxScore"] = maxScore;
 	root["blocked"] = blocked;
+    root["grouping"] = grouping;
+    root["packId"] = packId;
 
 	return root;
 }
