@@ -182,6 +182,8 @@ protected:
 	int32 StoreGameDataBase64(const char *gameId, const char *key, unsigned char const* bytes, s3eCallback onResult, s3eCallback onError, void *userData);
 
 	int32 StoreGameDataJson(const char *gameId, const char *key, const char* jsonObject, s3eCallback onResult, s3eCallback onError, void *userData, bool append = false);
+    
+    int32 StoreGameDataJsonBatch(const char *gameId, const char *key, const char* jsonObject, s3eCallback onResult, s3eCallback onError, void *userData, bool append);
 
 	int32 GetGameDataBase64(const char *gameId, const char *key, s3eCallback onResult, s3eCallback onError, void *userData);
 

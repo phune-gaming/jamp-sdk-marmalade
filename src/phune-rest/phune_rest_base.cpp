@@ -217,6 +217,49 @@ int32 PhuneRestBase::StoreGameDataBase64(const char *gameId, const char *key, un
 	return 0;
 }
 
+int32 PhuneRestBase::StoreGameDataJsonBatch(const char *gameId, const char *key, const char* jsonObject, s3eCallback onResult, s3eCallback onError, void *userData, bool append){
+    char resource[200];
+    std::memset(resource, 0, sizeof(resource));
+    
+    if (append){
+        sprintf(resource, "/jamp/me/preferences/%s/batch?gameId=%s&append=true", key, gameId);
+    }
+    else
+    {
+        sprintf(resource, "/jamp/me/preferences/%s/batch?gameId=%s", key, gameId);
+    }
+    
+    if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
+    {
+        pendingRequest pr;
+        pr.body = jsonObject;
+        pr.onError = onError;
+        pr.onResult = onResult;
+        pr.resource = std::string(resource);
+        pr.responseObjectType = NONE;
+        pr.sendType = CIwHTTP::PUT;
+        pr.userData = userData;
+        pendingRequests().push_back(pr);
+        
+        return 0;
+    }
+    
+    if (onGoingRequest && onGoingRequest->requestStatus == READY){
+        delete onGoingRequest;
+        onGoingRequest = NULL;
+    }
+    
+    _onResult = onResult;
+    _onError = onError;
+    
+    
+    onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonObject, userData);
+    
+    return 0;
+
+}
+    
+
 int32 PhuneRestBase::StoreGameDataJson(const char *gameId, const char *key, const char* jsonObject, s3eCallback onResult, s3eCallback onError, void *userData, bool append){
 
 	char resource[200];
