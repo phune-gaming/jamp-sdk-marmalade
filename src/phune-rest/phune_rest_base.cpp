@@ -58,7 +58,7 @@ PhuneRestBase::PhuneRestBase()
 
 PhuneRestBase::~PhuneRestBase()
 {
-	if (onGoingRequest != NULL)
+	if (onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
 	{
 		delete onGoingRequest;
 		onGoingRequest = NULL;
