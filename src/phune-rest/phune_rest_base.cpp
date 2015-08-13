@@ -754,10 +754,6 @@ int32 RequestData::GotData(void*, void *userData)
 	
 	RequestData *requestData = static_cast<RequestData*>(userData);
 
-	if (!requestData->http_object->ContentFinished()){
-		IwTrace(PHUNE, ("Still not finished"));
-		return 0;
-	}
 	// This is the callback indicating that a ReadContent call has
 	// completed.  Either we've finished, or a bigger buffer is
 	// needed.  If the correct ammount of data was supplied initially,
@@ -782,11 +778,11 @@ int32 RequestData::GotData(void*, void *userData)
 		else
 			requestData->len += 1024;
 
-		IwTrace(PHUNE, ("on got data"));
+		IwTrace(PHUNE, ("On got data Chunked"));
 
 		// Allocate some more space and fetch the data.
 		requestData->result = (char*)s3eRealloc(requestData->result, requestData->len);
-		requestData->http_object->ReadContent(&(requestData->result[oldLen]), requestData->len - oldLen, GotData);
+		requestData->http_object->ReadDataAsync(&(requestData->result[oldLen]), requestData->len - oldLen, REQUEST_TIMEOUT, GotData, requestData);
 	}
 	else
 	{
