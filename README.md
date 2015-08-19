@@ -2,6 +2,6 @@
 
 ## License
 
-Copyright (c) 2014 Present Technologies
+Copyright (c) 2015 Present Technologies
 
 Licensed under the MIT license.
