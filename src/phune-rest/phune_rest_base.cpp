@@ -654,17 +654,21 @@ RequestData::RequestData(const char *resource, CIwHTTP *http_object, CIwHTTP::Se
 RequestData::~RequestData()
 {
 	//FIXME Prego empurrra com a barriga
-	return;
+	//return;
 
 	if (http_object != NULL)
-		if (!http_object->ContentFinished())
-			http_object->Cancel();
+		http_object->Cancel();
+			
+
+	http_object = NULL;
+
 
 	try{
 		if (result && result != NULL)
 		{
 			char **resultBuffer = &(result);
 			s3eFree(*resultBuffer);
+			result = NULL;
 		}
 	}
 	catch (int e){
@@ -759,6 +763,11 @@ int32 RequestData::GotData(void*, void *userData)
 	// needed.  If the correct ammount of data was supplied initially,
 	// then this will only be called once. However, it may well be
 	// called several times when using chunked encoding.
+
+	if (requestData->http_object == NULL){
+		IwTrace(PHUNE, ("IGNORING..."));
+		return 0;
+	}
 
 	// Firstly see if there's an error condition.
 	if (requestData->http_object->GetStatus() == S3E_RESULT_ERROR || requestData->http_object->GetResponseCode()>=400)
