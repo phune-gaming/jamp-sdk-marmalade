@@ -47,10 +47,13 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore sc
 
 	
 	score.matchId = currentMatch->matchId;
+	
+
 
 	PhunePlayer player;
 	player.score = score.score;
 	player.status = status;
+	player.id = currentMatch->playerId;
 
 	int64 t = getCurrentTime();
 
