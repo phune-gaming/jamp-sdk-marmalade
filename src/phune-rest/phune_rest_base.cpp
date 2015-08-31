@@ -768,7 +768,7 @@ int32 RequestData::GotData(void*, void *userData)
 	// then this will only be called once. However, it may well be
 	// called several times when using chunked encoding.
 
-	if (requestData->http_object == NULL){
+	if (requestData->http_object == NULL || requestData->http_object->GetResponseCode() == NULL){
 		IwTrace(PHUNE, ("IGNORING..."));
 		return 0;
 	}
