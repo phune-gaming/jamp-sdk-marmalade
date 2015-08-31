@@ -297,7 +297,7 @@ static int32 onMatchId(void *data, void*){
 	pack->starsWon = 11;
 
 	//pr->EndMatch(matchId, pp, onEndMatch, onError);
-	pr->EndMatch(RHYTHM, "1", score, WINNER, onEndMatch, onError);
+    pr->EndMatch(RHYTHM, "1", score, WINNER, onEndMatch, onError);
 
 	//pr->GetMe(onResultPhuneUser, onError);
 
@@ -453,7 +453,7 @@ static int32 onInit(void *data, void*){
     JampPack jp;
     
     
-    pr->GetPacksInGame(RHYTHM, onPack, onError);
+    //pr->GetPacksInGame(RHYTHM, onPack, onError);
     //pr->StorePackInfoInGame(PLATFORM, <#JampPack pack#>, <#s3eCallback onResult#>, <#s3eCallback onError#>)
 
 
@@ -504,7 +504,7 @@ int main()
 	//pr->StartMatch(RHYTHM, onMatchId, onError);
 	//pr->GetScoreForMatch("1000", "1", onGetScore, onError);
 
-	//pr->StartMatch(gameId, onMatchId, onError);
+	pr->StartMatch(RHYTHM, onMatchId, onError);
 
 	outStr = "NONE";
 
