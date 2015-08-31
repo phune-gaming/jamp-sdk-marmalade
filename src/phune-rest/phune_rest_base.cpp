@@ -653,14 +653,15 @@ RequestData::RequestData(const char *resource, CIwHTTP *http_object, CIwHTTP::Se
 
 RequestData::~RequestData()
 {
-	//FIXME Prego empurrra com a barriga
-	//return;
+	if (requestStatus == NO_CONTENT || requestStatus == REQUEST_ERROR){
+		return;
+	}
 
-	if (http_object != NULL)
+	/*if (http_object != NULL)
 		http_object->Cancel();
 			
 
-	http_object = NULL;
+	http_object = NULL;*/
 
 
 	try{
@@ -697,7 +698,10 @@ int32 RequestData::GotHeaders(void*, void *userData)
 	
 	if (requestData->responseObjectType == NONE || requestData->http_object->GetResponseCode() == 204){
 		IwTrace(PHUNE, ("on got headers NONE or No content"));
-        requestData->requestStatus = NO_CONTENT;
+		//read data for 0 bytes
+		requestData->http_object->ReadData(NULL, 0);
+        
+		requestData->requestStatus = NO_CONTENT;
         requestData->onResult(NULL, requestData);
         return 0;
 	}
