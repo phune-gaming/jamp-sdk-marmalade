@@ -653,8 +653,9 @@ RequestData::RequestData(const char *resource, CIwHTTP *http_object, CIwHTTP::Se
 
 RequestData::~RequestData()
 {
-	//FIXME Prego empurrra com a barriga
-	//return;
+	if (requestStatus == NO_CONTENT || requestStatus == REQUEST_ERROR || len == 0){
+		return;
+	}
 
 	if (http_object != NULL)
 		http_object->Cancel();
@@ -697,7 +698,13 @@ int32 RequestData::GotHeaders(void*, void *userData)
 	
 	if (requestData->responseObjectType == NONE || requestData->http_object->GetResponseCode() == 204){
 		IwTrace(PHUNE, ("on got headers NONE or No content"));
-        requestData->requestStatus = NO_CONTENT;
+		//read data for 0 bytes
+		requestData->http_object->ReadData(NULL, 0);
+        
+        requestData->http_object->Cancel();
+        //requestData->http_object = NULL;
+        
+		requestData->requestStatus = NO_CONTENT;
         requestData->onResult(NULL, requestData);
         return 0;
 	}
@@ -764,7 +771,7 @@ int32 RequestData::GotData(void*, void *userData)
 	// then this will only be called once. However, it may well be
 	// called several times when using chunked encoding.
 
-	if (requestData->http_object == NULL){
+	if (requestData->http_object == NULL || (requestData->http_object->GetResponseCode() >= 600 && requestData->http_object->GetResponseCode() <= 0)){
 		IwTrace(PHUNE, ("IGNORING..."));
 		return 0;
 	}

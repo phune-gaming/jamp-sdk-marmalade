@@ -27,6 +27,8 @@ public:
 	ClassificationType classification;
 	//notes performance
 	JsonListObject<JampNotePerformance> notesPerformance;
+    //Beats per minute
+    int64 bpm;
 	//Time stamp of the server (automatic)
 	int64 timeStamp;
 };
