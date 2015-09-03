@@ -663,6 +663,8 @@ RequestData::~RequestData()
 
 	http_object = NULL;
 
+    //FIXME para ver pq é q às vezes o result n está a dar
+    return;
 
 	try{
 		if (result && result != NULL)
