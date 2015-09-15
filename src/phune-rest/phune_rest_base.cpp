@@ -78,6 +78,14 @@ int64 PhuneRestBase::getCurrentTime(){
 
 int32 PhuneRestBase::_Init(s3eCallback onResult, s3eCallback onError, void *userData){
 
+    if(server_time != 0){
+        IwTrace(PHUNE, ("Init already initialized returning"));
+        char resource[200];
+        std::memset(resource, 0, sizeof(resource));
+        sprintf(resource, "%lld", server_time);
+        onResult(resource, userData);
+        return 0;
+    }
 	char resource[200];
 	std::memset(resource, 0, sizeof(resource));
 	sprintf(resource, "/jamp/utils/time");
@@ -170,10 +178,7 @@ int32 PhuneRestBase::_GetMe(s3eCallback onResult, s3eCallback onError, void *use
 		return 0;
 	}
 
-	if (onGoingRequest && onGoingRequest->requestStatus == READY){
-		delete onGoingRequest;
-		onGoingRequest = NULL;
-	}
+	
 
 	_onResult = onResult;
 	_onError = onError;
@@ -246,10 +251,7 @@ int32 PhuneRestBase::StoreGameDataJsonBatch(const char *gameId, const char *key,
         return 0;
     }
     
-    if (onGoingRequest && onGoingRequest->requestStatus == READY){
-        delete onGoingRequest;
-        onGoingRequest = NULL;
-    }
+    
     
     _onResult = onResult;
     _onError = onError;
@@ -290,10 +292,7 @@ int32 PhuneRestBase::StoreGameDataJson(const char *gameId, const char *key, cons
 		return 0;
 	}
 
-	if (onGoingRequest && onGoingRequest->requestStatus == READY){
-		delete onGoingRequest;
-		onGoingRequest = NULL;
-	}
+	
 
 	_onResult = onResult;
 	_onError = onError;
@@ -324,11 +323,7 @@ int32 PhuneRestBase::GetGameDataBase64(const char *gameId, const char *key, s3eC
 		return 0;
 	}
 
-	if (onGoingRequest && onGoingRequest->requestStatus == READY){
-		delete onGoingRequest;
-		onGoingRequest = NULL;
-	}
-
+	
 	_onResult = onResult;
 	_onError = onError;
 
@@ -358,11 +353,7 @@ int32 PhuneRestBase::GetGameDataJson(const char *gameId, const char *key, s3eCal
 		return 0;
 	}
 
-	if (onGoingRequest && onGoingRequest->requestStatus == READY){
-		delete onGoingRequest;
-		onGoingRequest = NULL;
-	}
-
+	
 	_onResult = onResult;
 	_onError = onError;
 
@@ -392,10 +383,7 @@ int32 PhuneRestBase::GetGameDataJsonList(const char *gameId, const char *key, s3
 		return 0;
 	}
 
-	if (onGoingRequest && onGoingRequest->requestStatus == READY){
-		delete onGoingRequest;
-		onGoingRequest = NULL;
-	}
+	
 
 	_onResult = onResult;
 	_onError = onError;
@@ -425,11 +413,7 @@ int32 PhuneRestBase::DeleteGameData(const char *gameId, const char *key, s3eCall
 		return 0;
 	}
 
-	if (onGoingRequest && onGoingRequest->requestStatus == READY){
-		delete onGoingRequest;
-		onGoingRequest = NULL;
-	}
-
+	
 	_onResult = onResult;
 	_onError = onError;
 
@@ -462,10 +446,7 @@ int32 PhuneRestBase::_StartMatch(const char *gameId, s3eCallback onResult, s3eCa
 		return 0;
 	}
 
-	if (onGoingRequest && onGoingRequest->requestStatus == READY){
-		delete onGoingRequest;
-		onGoingRequest = NULL;
-	}
+	
 
 	_onResult = onResult;
 	_onError = onError;
@@ -496,10 +477,7 @@ int32 PhuneRestBase::_EndMatch(int64 matchId, PhunePlayer player, s3eCallback on
 		return 0;
 	}
 
-	if (onGoingRequest && onGoingRequest->requestStatus == READY){
-		delete onGoingRequest;
-		onGoingRequest = NULL;
-	}
+	
 
 	_onResult = onResult;
 	_onError = onError;
@@ -657,8 +635,8 @@ RequestData::~RequestData()
 		return;
 	}
 
-	if (http_object != NULL)
-		http_object->Cancel();
+	//if (http_object != NULL)
+	//	http_object->Cancel();
 			
 
 	http_object = NULL;
