@@ -153,17 +153,7 @@ public:
 			return 0;
 		}
 
-		if (onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
-		{
-			onError(new RequestError(ONGOING_REQUEST, 0), NULL);
-			return 0;
-		}
-
-		if (onGoingRequest && onGoingRequest->requestStatus == READY){
-			delete onGoingRequest;
-			onGoingRequest = NULL;
-		}
-
+		
 		_onResult = onResult;
 		_onError = onError;
 
