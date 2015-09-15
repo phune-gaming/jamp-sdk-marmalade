@@ -114,12 +114,8 @@ int32 PhuneRestBase::_Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCall
 	//uri.append(LOGIN_REDIRECT);
     
     
-
-	if (onGoingRequest && onGoingRequest->requestStatus == READY){
-		IwTrace(PHUNE, ("PhuneRestBase::_Login Delete ongoing data"));
-		delete onGoingRequest;
-		onGoingRequest = NULL;
-	}
+    onGoingRequest = new RequestData();
+    onGoingRequest->requestStatus = ONGOING_REQUEST;
 
 	onGoingRequest->userData = userData;
 
@@ -209,12 +205,7 @@ int32 PhuneRestBase::StoreGameDataBase64(const char *gameId, const char *key, un
 
 		return 0;
 	}
-
-	if (onGoingRequest && onGoingRequest->requestStatus == READY){
-		delete onGoingRequest;
-		onGoingRequest = NULL;
-	}
-
+    
 	_onResult = onResult;
 	_onError = onError;
 
@@ -571,6 +562,8 @@ int32 PhuneRestBase::_onHideWebView(s3eWebView *instance, void *systemData, void
 			out.erase(pos);
 		}
 		
+        delete object->onGoingRequest;
+        
 		IwTrace(PHUNE, ("PhuneRestBase::onHideWebView erasing %ld chars:%s",prefix.length(), prefix.c_str()));
 		out.erase(0, prefix.length());
 
@@ -688,6 +681,7 @@ int32 RequestData::GotHeaders(void*, void *userData)
         requestData->onResult(NULL, requestData);
         return 0;
 	}
+    
 	else
 	{
 		std::string strCookie;
@@ -714,7 +708,20 @@ int32 RequestData::GotHeaders(void*, void *userData)
 			authorization_prefix.append(strCookie.c_str());
 			requestData->http_object->SetRequestHeader("Authorization", authorization_prefix.c_str());
 		}
-
+        
+        if(requestData->responseObjectType == PHUNE_REDIRECT_LOGIN){
+            int tmp = FINISHED;
+            IwTrace(PHUNE, ("on got headers NONE or No content"));
+            //read data for 0 bytes
+            requestData->http_object->ReadData(NULL, 0);
+            
+            requestData->http_object->Cancel();
+            //requestData->http_object = NULL;
+            
+            requestData->requestStatus = NO_CONTENT;
+            requestData->onResult(&tmp, requestData);
+            return 0;
+        }
 
 		requestData->len = requestData->http_object->ContentExpected();
 		if (!requestData->len)
@@ -744,6 +751,7 @@ int32 RequestData::GotData(void*, void *userData)
 {
 	
 	RequestData *requestData = static_cast<RequestData*>(userData);
+    
 
 	// This is the callback indicating that a ReadContent call has
 	// completed.  Either we've finished, or a bigger buffer is
