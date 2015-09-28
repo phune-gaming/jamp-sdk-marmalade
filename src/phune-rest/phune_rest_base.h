@@ -157,8 +157,8 @@ public:
 		_onResult = onResult;
 		_onError = onError;
 
-		PhuneRestBase::onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonListObject.Serialize().c_str(), userData);
-		PhuneRestBase::onGoingRequest->base = this;
+		onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonListObject.Serialize().c_str(), userData);
+		onGoingRequest->base = this;
 
 		return 0;
 	}
