@@ -187,6 +187,8 @@ protected:
 
 	int32 _Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCallback onError, void *userData);
 
+	int32 _Logout();
+
 	int32 _StartMatch(const char *gameId, s3eCallback onResult, s3eCallback onError, void *userData);
 
 	int32 _EndMatch(int64 matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError, void *userData);
