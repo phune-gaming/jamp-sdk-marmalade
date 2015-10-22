@@ -158,6 +158,11 @@ int32 PhuneRestBase::_Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCall
 	return 0;
 }
 
+int32 PhuneRestBase::_Logout(){
+    s3eFileDelete("phune_cookie.cookie");
+    return 0;
+}
+
 int32 PhuneRestBase::_GetMe(s3eCallback onResult, s3eCallback onError, void *userData){
 
 	if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)

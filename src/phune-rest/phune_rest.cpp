@@ -18,6 +18,10 @@ int32 PhuneRest::Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCallback 
 	return PhuneRestBase::_Login(g_WebView, onResult, onError, userData);
 }
 
+int32 PhuneRest::Logout(){
+    return PhuneRestBase::_Logout();
+}
+
 int32 PhuneRest::GetMe(s3eCallback onResult, s3eCallback onError, void *userData){
 	return _GetMe(onResult, onError, userData);
 }
