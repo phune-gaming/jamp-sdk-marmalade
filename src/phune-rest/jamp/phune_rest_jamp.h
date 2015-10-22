@@ -5,9 +5,12 @@
 #include "../phune_rest.h"
 #include "../../model/jamp/jamp_score.h"
 #include "../../model/jamp/jamp_pack.h"
+#include "../../model/jamp/events/jamp_consecutive_perfects_event.h"
+#include "../../model/jamp/events/jamp_all_perfects_event.h"
 #include "../../model/json_list_object.h"
 #include "../../model/json_string.h"
 #include "../../model/phune/phune_match.h"
+#include "../../model/phune/phune_game_triggered_event.h"
 
 #include <stdlib.h>
 #include <map>

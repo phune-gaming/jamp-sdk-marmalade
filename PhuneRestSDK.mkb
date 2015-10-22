@@ -36,6 +36,12 @@ files
 	(src/model/jamp)
 	"*.cpp"
 	"*.h"
+
+	#Model events JAMP
+	["src/model/jamp/events"]
+	(src/model/jamp/events)
+	"*.cpp"
+	"*.h"
 }
 
 subprojects

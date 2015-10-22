@@ -22,6 +22,7 @@
 #include "../model/phune/phune_player.h"
 #include "../model/jamp/jamp_score.h"
 #include "../model/phune/phune_match.h"
+#include "../model/phune/phune_game_triggered_event.h"
 
 //timeout 30 seconds
 #define REQUEST_TIMEOUT 30000
@@ -189,6 +190,8 @@ protected:
 	int32 _StartMatch(const char *gameId, s3eCallback onResult, s3eCallback onError, void *userData);
 
 	int32 _EndMatch(int64 matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError, void *userData);
+    
+    int32 _StoreMatchEvents(JsonListObject<GameTriggerdEvent> events, int64 matchId, s3eCallback onResult, s3eCallback onError, void *userData);
 public:
 	
 
