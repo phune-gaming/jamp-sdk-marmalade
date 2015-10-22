@@ -38,6 +38,10 @@ int32 JampCellPerformance::DeserializeFromValue(Value src){
     if (!src["bpm"].empty()){
         bpm = src["bpm"].asUInt64();
     }
+    
+    if (!src["level"].empty()){
+        level = src["level"].asUInt64();
+    }
 
 	if (!src["timeStamp"].empty())
 		timeStamp = src["timeStamp"].asUInt64();
@@ -74,6 +78,8 @@ Value JampCellPerformance::SerializeToValue(){
 	root["notesPerformance"] = notesPerformance.SerializeToValue();
 
     root["bpm"] = bpm;
+    
+    root["level"] = level;
     
 	root["timeStamp"] = timeStamp;
 

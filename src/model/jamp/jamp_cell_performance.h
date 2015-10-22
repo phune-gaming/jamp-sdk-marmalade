@@ -29,6 +29,8 @@ public:
 	JsonListObject<JampNotePerformance> notesPerformance;
     //Beats per minute
     int64 bpm;
+    //level
+    int64 level;
 	//Time stamp of the server (automatic)
 	int64 timeStamp;
 };
