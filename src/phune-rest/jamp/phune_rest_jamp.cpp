@@ -62,8 +62,25 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore sc
 
     IwTrace(PHUNE, ("Creating map begin"));
     std::map<int64, JsonListObject<JsonString> > map;
+    int consecutivePerfects = 0;
+    int bestSequence = -1;
+    bool allPerfects = true;
 	//aggregate cells performance
     for (std::vector<JampCellPerformance>::iterator it = score.cellsPerformance.elements.begin(); it != score.cellsPerformance.elements.end(); it++){
+        
+        if (it->classification == PERFECT) {
+            consecutivePerfects++;
+        }
+        else{
+            allPerfects = false;
+            if(consecutivePerfects > 3 && consecutivePerfects > bestSequence){
+                bestSequence = consecutivePerfects;
+            }
+            
+            consecutivePerfects = 0;
+        }
+
+        
         
         //found
         if (map.find(it->cellId) == map.end()) {
@@ -102,23 +119,40 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore sc
     }
     IwTrace(PHUNE, ("Sending cells end"));
     
+    
+    //Send the events
+    
+    JsonListObject<GameTriggerdEvent> events;
+    
+    //consecutive perfects
+    if(consecutivePerfects != -1){
+        ConsecutivePerfectsEvent cpe(consecutivePerfects, gameId);
+        
+        cpe.playerId = currentMatch->playerId;
+        
+        events.pushElement(cpe);
+    }
+    
+    //all perfects
+    if(allPerfects){
+        AllPerfectsEvent ape(gameId, level);
+        ape.playerId = currentMatch->playerId;
+        
+        events.pushElement(ape);
+    }
+        
+    
+    if(events.elements.size() > 0){
+        PhuneRest::StoreMatchEvents(events, score.matchId, onNullReturn, onError);
+    }
 
-	//store the Cell performances
-	/*for (std::vector<JampCellPerformance>::iterator it = score.cellsPerformance.elements.begin(); it != score.cellsPerformance.elements.end(); it++){
-		char buffer4[50];
-		sprintf(buffer4, "%s%lld", CELL_PERFORMACE_PREFIX, it->cellId);
-
-		std::string key_cell = std::string(buffer4);
-		it->timeStamp = t;
-		PhuneRestBase::StoreGameDataJson(s.c_str(), key_cell.c_str(), it->Serialize().c_str(), onNullReturn, onError, userData, true);
-	}*/
 
 	//store the score for the match
 	score.timeStamp = t;
 	PhuneRestBase::StoreGameDataJson(s.c_str(), s3.c_str(), score.Serialize().c_str(), onResult, onError, userData, true);
 	
-	//TODO send the events
-
+    
+    
 	currentMatch = NULL;
 
 	return 0;

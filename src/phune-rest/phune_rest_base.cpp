@@ -478,6 +478,37 @@ int32 PhuneRestBase::_EndMatch(int64 matchId, PhunePlayer player, s3eCallback on
     return 0;
 }
 
+int32 PhuneRestBase::_StoreMatchEvents(JsonListObject<GameTriggerdEvent> events, int64 matchId, s3eCallback onResult, s3eCallback onError, void *userData){
+    char resource[200];
+    std::memset(resource, 0, sizeof(resource));
+    sprintf(resource, "/jamp/matches/%lld/events", matchId);
+    
+    IwTrace(PHUNE, ("Store events:%s", events.Serialize().c_str()));
+    if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
+    {
+        pendingRequest pr;
+        
+        pr.body = events.Serialize();
+        pr.onError = onError;
+        pr.onResult = onResult;
+        pr.resource = std::string(resource);
+        pr.responseObjectType = NONE;
+        pr.sendType = CIwHTTP::PUT;
+        pr.userData = userData;
+        pendingRequests().push_back(pr);
+        
+        return 0;
+    }
+    
+    
+    
+    _onResult = onResult;
+    _onError = onError;
+    
+    onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, events.Serialize().c_str(), userData);
+    
+    return 0;
+}
 
 int32 PhuneRestBase::GotResult(void *result, void *userData){
 	RequestData *requestData = static_cast<RequestData*>(userData);

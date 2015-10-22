@@ -41,3 +41,8 @@ int32 PhuneRest::StartMatch(const char *gameId, s3eCallback onResult, s3eCallbac
 int32 PhuneRest::EndMatch(int64 matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError, void *userData){
 	return PhuneRestBase::_EndMatch(matchId, player, onResult, onError, userData);
 }
+
+int32 PhuneRest::StoreMatchEvents(JsonListObject<GameTriggerdEvent> events, int64 matchId, s3eCallback onResult, s3eCallback onError, void *userData){
+    return PhuneRestBase::_StoreMatchEvents(events, matchId, onResult, onError, userData);
+}
+

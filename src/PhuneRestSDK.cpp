@@ -219,7 +219,7 @@ static int32 onMatchId(void *data, void*){
 	notePerformance.noteCode = "C";
 	cellPerformace.notesPerformance.pushElement(notePerformance);
 
-	score.cellsPerformance.pushElement(cellPerformace);
+	/*score.cellsPerformance.pushElement(cellPerformace);
 	score.cellsPerformance.pushElement(cellPerformace);
     score.cellsPerformance.pushElement(cellPerformace);
     score.cellsPerformance.pushElement(cellPerformace);
@@ -265,6 +265,31 @@ static int32 onMatchId(void *data, void*){
     
     cellPerformace.cellId = 30;
     cellPerformace.classification = BAD;
+    
+    
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);
+    score.cellsPerformance.pushElement(cellPerformace);*/
+
+    cellPerformace.cellId = 40;
+    cellPerformace.classification = PERFECT;
     
     
     score.cellsPerformance.pushElement(cellPerformace);

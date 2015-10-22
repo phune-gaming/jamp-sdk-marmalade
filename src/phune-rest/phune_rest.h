@@ -8,6 +8,8 @@
 #include "../model/phune/phune_user.h"
 #include "../model/jamp/jamp_score.h"
 #include "../model/json_list_object.h"
+#include "../model/phune/phune_game_triggered_event.h"
+
 
 class PhuneRest : public PhuneRestBase
 {
@@ -97,6 +99,18 @@ public:
 	@param userData The object to be received on callback.
 	*/
 	int32 EndMatch(int64 matchId, PhunePlayer player, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
+    
+    /*
+     Store match events in the serve.
+     
+     @param events The match Events.
+     @param matchId The match id. Obtained in start match.
+     @param player The player of the match with the score and result.
+     @param onResult The callback in case of success. It returns in the first paramenter a match id as a char*.
+     @param onError The callback in case of error. It returns in the first paramenter an RequestError object.
+     @param userData The object to be received on callback.
+    */
+    int32 StoreMatchEvents(JsonListObject<GameTriggerdEvent> events, int64 matchId, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 
 };
 

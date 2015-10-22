@@ -72,3 +72,4 @@ Json::Value JsonListObject<T>::SerializeToValue(){
 
 	return root;
 }
+
