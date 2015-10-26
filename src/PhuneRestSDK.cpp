@@ -341,9 +341,71 @@ static int32 onMe(void *data, void*){
 		outStr.append("\n");
 		outStr.append(aux);
 	}
+    
 
 	return 0;
 }
+
+static int32 onWebView2(void *data, void*){
+    IW_CALLSTACK("PhuneRestSDK::onWebView");
+    IwTrace(PHUNE, ("onWebView"));
+    int *result = static_cast<int*>(data);
+    
+    //int32 width = s3eWebViewGetHandleProperty(g_WebView, S3E_WEBVIEW_WIDTH);
+    
+    char aux[100];
+    /*switch (*result)
+    {
+        case LOADING:
+            IwTrace(PHUNE, ("onWebView LOADING"));
+            sprintf(aux, "`x000000[%lld]On WebView LOADING!!", pr->getCurrentTime());
+            break;
+        case HIDE_VIEW:
+            s3eWebViewHide(g_WebView);
+            IwTrace(PHUNE, ("onWebView HIDE_VIEW"));
+            sprintf(aux, "`x000000[%lld]On WebView HIDE_VIEW!!", pr->getCurrentTime());
+            break;
+        case STOP_VIEW:
+            s3eWebViewDestroy(g_WebView);
+            g_WebView = NULL;
+            IwTrace(PHUNE, ("onWebView STOP_VIEW"));
+            sprintf(aux, "`x000000[%lld]On WebView STOP_VIEW!!", pr->getCurrentTime());
+            break;
+        case FINISHED:
+            
+            IwTrace(PHUNE, ("onWebView FINISHED"));
+            sprintf(aux, "`x000000[%lld]On WebView FINISHED!!", pr->getCurrentTime());
+            
+            break;
+        default:
+            IwTrace(PHUNE, ("onWebView default"));
+            sprintf(aux, "`x000000[%lld]On WebView DEFAULT!!", pr->getCurrentTime());
+            break;
+    }*/
+    
+    sprintf(aux, "`x000000[%lld]On WebView2 FINISHED!!", pr->getCurrentTime());
+    
+    
+    outStr.append("\n");
+    outStr.append(aux);
+    
+    return 0;
+}
+
+
+static int32 onLogout(void*, void*){
+    IwTrace(PHUNE, ("onLogout"));
+    
+    g_WebView = s3eWebViewCreate();
+    
+    s3eWebViewShow(g_WebView, 0, 0, 100, 100);
+    
+    //s3eWebViewSetHandleProperty(g_WebView, S3E_WEBVIEW_SCROLLING,1);
+    
+    pr->Login(g_WebView, onWebView2, onError);
+    
+}
+
 
 
 
@@ -376,9 +438,17 @@ static int32 onWebView(void *data, void*){
             
 		IwTrace(PHUNE, ("onWebView FINISHED"));
 		sprintf(aux, "`x000000[%lld]On WebView FINISHED!!", pr->getCurrentTime());
-
+            //s3eWebViewHide(g_WebView);
+            //s3eWebViewDestroy(g_WebView);
+            //g_WebView = NULL;
 		//Calling a new me :) after login
-		pr->GetMe(onMe, onError);
+            g_WebView = s3eWebViewCreate();
+            
+            s3eWebViewShow(g_WebView, 0, 0, 100, 100);
+            
+            //s3eWebViewSetHandleProperty(g_WebView, S3E_WEBVIEW_SCROLLING,1);
+            
+            pr->Logout(onWebView2, onError);
         //pr->GetPacksInGame(RHYTHM, onPack, onError);
 		break;
 	default:
@@ -410,15 +480,15 @@ static int32 onMeAfterInit(void *data, void*){
 		//do the login in case of unresgistered
 		if (phuneUser->type == UNREGISTERED){
 
-			g_WebView = s3eWebViewCreate();
+			g_WebView = s3eWebViewCreate(false);
             
-            s3eWebViewShow(g_WebView, 0, 0, 0, 0);
+            
 
             //s3eWebViewSetHandleProperty(g_WebView, S3E_WEBVIEW_SCROLLING,1);
 			
 			pr->Login(g_WebView, onWebView, onError);
             
-            
+            s3eWebViewShow(g_WebView, 0, 0, 100, 200);
             
            
             
@@ -481,9 +551,12 @@ static int32 onInit(void *data, void*){
     //pr->GetPacksInGame(RHYTHM, onPack, onError);
     //pr->StorePackInfoInGame(PLATFORM, <#JampPack pack#>, <#s3eCallback onResult#>, <#s3eCallback onError#>)
 
+    g_WebView = s3eWebViewCreate();
 
 	//pr->GetMe(onMeAfterInit, onError);
-	//pr->Login(g_WebView, onWebView, onError);
+	pr->Login(g_WebView, onWebView, onError);
+    
+    s3eWebViewShow(g_WebView, 0, 0, 100, 100);
 
 	return 0;
 }
@@ -529,7 +602,7 @@ int main()
 	//pr->StartMatch(RHYTHM, onMatchId, onError);
 	//pr->GetScoreForMatch("1000", "1", onGetScore, onError);
 
-	pr->StartMatch(RHYTHM, onMatchId, onError);
+	//pr->StartMatch(RHYTHM, onMatchId, onError);
 
 	outStr = "NONE";
 

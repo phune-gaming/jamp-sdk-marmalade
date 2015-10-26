@@ -79,12 +79,17 @@ int64 PhuneRestBase::getCurrentTime(){
 int32 PhuneRestBase::_Init(s3eCallback onResult, s3eCallback onError, void *userData){
 
     if(server_time != 0){
-        IwTrace(PHUNE, ("Init already initialized returning"));
-        char resource[200];
-        std::memset(resource, 0, sizeof(resource));
-        sprintf(resource, "%lld", server_time);
-        onResult(resource, userData);
-        return 0;
+        s3eFile*  cookie_file = s3eFileOpen("phune_cookie.cookie", "r");
+        if(cookie_file){
+            s3eFileClose(cookie_file);
+            IwTrace(PHUNE, ("Init already initialized returning"));
+            char resource[200];
+            std::memset(resource, 0, sizeof(resource));
+            sprintf(resource, "%lld", server_time);
+            onResult(resource, userData);
+            return 0;
+        }
+        
     }
 	char resource[200];
 	std::memset(resource, 0, sizeof(resource));
@@ -101,7 +106,6 @@ int32 PhuneRestBase::_Init(s3eCallback onResult, s3eCallback onError, void *user
 
 int32 PhuneRestBase::_Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCallback onError, void *userData){
 	std::string  uri;
-
 	uri.append(URL_SCHEMA);
 	//uri.append("s");
 	uri.append("://");
@@ -111,7 +115,7 @@ int32 PhuneRestBase::_Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCall
 	uri.append(URL_CONTEXT);
 	uri.append(LOGIN_RESOURCE);
 	//uri.append("?");
-	//uri.append(LOGIN_REDIRECT);
+	//uri.append(LOGIN_REDIRECT_LOGOUT);
     
     
     onGoingRequest = new RequestData();
@@ -139,6 +143,8 @@ int32 PhuneRestBase::_Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCall
 		return 0;
 	}
 
+
+    
 	s3eResult result2 = s3eWebViewNavigate(g_WebView, uri.c_str());
 
 	int tmp = LOADING;
@@ -158,8 +164,69 @@ int32 PhuneRestBase::_Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCall
 	return 0;
 }
 
-int32 PhuneRestBase::_Logout(){
+int32 PhuneRestBase::_Logout(s3eCallback onResult, s3eCallback onError, void *userData){
     s3eFileDelete("phune_cookie.cookie");
+    http_object->SetRequestHeader("Cookie", "");
+    http_object->SetRequestHeader("Authorization", "");
+    std::string  uri;
+    
+    uri.append(URL_SCHEMA);
+    //uri.append("s");
+    uri.append("://");
+    uri.append(URL_HOST);
+    uri.append(LOGOUT_FACEBOOK_PAGE);
+    
+    uri.append("?redirectURL=");
+    uri.append(CIwUriEscape::Escape(string(LOGOUT_FACEBOOK_REDIRECT)));
+    
+    //cache buster
+    char buffer[50];
+    sprintf(buffer, "&cb=%lld", server_time);
+    uri.append(buffer);
+    
+    onGoingRequest = new RequestData();
+    onGoingRequest->requestStatus = ONGOING_REQUEST;
+    
+    onGoingRequest->userData = userData;
+    
+    _onResult = onResult;
+    _onError = onError;
+    pendingUserData = userData;
+    
+    s3eWebView *g_WebView = s3eWebViewCreate();
+    
+    //PhuneRestBase::onWebView = _onWebView;
+    s3eResult result1 = s3eWebViewRegister(S3E_WEBVIEW_FINISHED_LOADING, _onLogoutWebView, this, g_WebView);
+    
+    switch (result1)
+    {
+        case S3E_RESULT_SUCCESS:
+            IwTrace(PHUNE, ("SUCCESS ON REGISTER"));
+            break;
+        case S3E_RESULT_ERROR:
+        default:
+            IwTrace(PHUNE, ("ERROR ON REGISTER"));
+            onError(NULL, userData);
+            return 0;
+    }
+    
+    //s3eWebViewShow(g_WebView, 0, 0, 100, 100);
+    
+    s3eResult result2 = s3eWebViewNavigate(g_WebView, uri.c_str());
+    
+    switch (result2)
+    {
+        case S3E_RESULT_SUCCESS:
+            
+            break;
+        case S3E_RESULT_ERROR:
+        default:
+            onError(NULL, userData);
+            return 0;
+    }
+    
+    
+    
     return 0;
 }
 
@@ -618,6 +685,25 @@ int32 PhuneRestBase::_onHideWebView(s3eWebView *instance, void *systemData, void
 	return 0;
 }
 
+int32 PhuneRestBase::_onLogoutWebView(s3eWebView *instance, void *systemData, void *userData){
+    IwTrace(PHUNE, ("_onLogoutWebView"));
+    PhuneRestBase *object = static_cast<PhuneRestBase*>(userData);
+    std::string out = string(static_cast<const char*>(systemData));
+    
+    if (out.find(LOGOUT_FACEBOOK_REDIRECT)==0){
+        s3eWebViewUnRegister(S3E_WEBVIEW_FINISHED_LOADING, _onLogoutWebView, instance);
+        //s3eWebViewClearCache(instance);
+        s3eWebViewDestroy(instance);
+    
+        _onResult(NULL, object->pendingUserData);
+    }
+    
+    
+    
+    return 0;
+}
+
+
 //-----------------------------------------------------------------------------
 // From request data
 //-----------------------------------------------------------------------------
@@ -883,6 +969,10 @@ int32 RequestData::GotData(void*, void *userData)
 			IwTrace(PHUNE, ("Received data PHUNE_REDIRECT_LOGIN"));
 			requestData->onResult(&tmp, requestData);
 			break;
+        case PHUNE_LOGOUT:
+                IwTrace(PHUNE, ("Received data PHUNE_LOGOUT"));
+                requestData->onResult(NULL, requestData);
+                break;
 		default:
 			IwTrace(PHUNE, ("Received data default"));
 			requestData->requestStatus = REQUEST_ERROR;
