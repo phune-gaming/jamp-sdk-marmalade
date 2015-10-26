@@ -36,9 +36,14 @@ public:
 	*/
 	int32 Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 
-	/**
-    */
-    int32 Logout();
+    /*
+     Do the Logout
+     
+     @param onResult The calbacks after logout.
+     @param onError The callback in case of error.
+     @param userData The object to be received on callback.
+     */
+    int32 Logout(s3eCallback onResult, s3eCallback onError, void *userData = NULL);
 	
 	/*
 	Get my Phune User or create one. It puts the user in the session.

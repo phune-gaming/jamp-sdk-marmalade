@@ -11,6 +11,7 @@
 #include <ctime>
 #include <stdlib.h>
 #include "s3eWebView.h"
+#include <IwUriEscape.h>
 
 
 #include "../model/phune/phune_preference.h"
@@ -34,7 +35,11 @@
 #define URL_CONTEXT "/phune/r"
 
 #define LOGIN_RESOURCE "/me/login/FACEBOOK"
+#define LOGOUT_RESOURCE "/me/logout"
 #define LOGIN_REDIRECT "/socialgateway/success"
+
+#define LOGOUT_FACEBOOK_PAGE "/platform/redirects/facebook-logout.html"
+#define LOGOUT_FACEBOOK_REDIRECT "http://dev.phune.cadsh.com/phune/r/jamp/utils/time"
 
 
 
@@ -63,6 +68,7 @@ enum ResponseObjectType
 	PHUNE_PREFERENCE_JSON_LIST,
 	PHUNE_STRING,
 	PHUNE_REDIRECT_LOGIN,
+    PHUNE_LOGOUT,
 	NONE
 };
 
@@ -187,7 +193,7 @@ protected:
 
 	int32 _Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCallback onError, void *userData);
 
-	int32 _Logout();
+	int32 _Logout(s3eCallback onResult, s3eCallback onError, void *userData);
 
 	int32 _StartMatch(const char *gameId, s3eCallback onResult, s3eCallback onError, void *userData);
 
@@ -226,6 +232,8 @@ protected:
 	static int32 GotResult(void*, void*);
 
 	static int32 _onHideWebView(s3eWebView *instance, void *systemData, void *userData);
+    
+    static int32 _onLogoutWebView(s3eWebView *instance, void *systemData, void *userData);
 
 private:
 
