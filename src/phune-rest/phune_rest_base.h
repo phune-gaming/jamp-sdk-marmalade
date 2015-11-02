@@ -30,7 +30,7 @@
 
 //define base url
 #define URL_SCHEMA "http"
-#define URL_HOST "dev.phune.cadsh.com"
+#define URL_HOST "api.jamp.io"
 #define URL_PORT "80"
 #define URL_CONTEXT "/phune/r"
 
@@ -38,8 +38,8 @@
 #define LOGOUT_RESOURCE "/me/logout"
 #define LOGIN_REDIRECT "/socialgateway/success"
 
-#define LOGOUT_FACEBOOK_PAGE "/platform/redirects/facebook-logout.html"
-#define LOGOUT_FACEBOOK_REDIRECT "http://dev.phune.cadsh.com/phune/r/jamp/utils/time"
+#define LOGOUT_FACEBOOK_PAGE "http://jamp.io/platform/redirects/facebook-logout.html"
+#define LOGOUT_FACEBOOK_REDIRECT "http://api.jamp.io/phune/r/jamp/utils/time"
 
 
 
