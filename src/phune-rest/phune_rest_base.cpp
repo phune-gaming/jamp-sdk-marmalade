@@ -170,18 +170,18 @@ int32 PhuneRestBase::_Logout(s3eCallback onResult, s3eCallback onError, void *us
     http_object->SetRequestHeader("Authorization", "");
     std::string  uri;
     
-    uri.append(URL_SCHEMA);
-    //uri.append("s");
-    uri.append("://");
-    uri.append(URL_HOST);
     uri.append(LOGOUT_FACEBOOK_PAGE);
     
     uri.append("?redirectURL=");
     uri.append(CIwUriEscape::Escape(string(LOGOUT_FACEBOOK_REDIRECT)));
+    int64 cb = server_time;
+    if(cb == 0){
+        cb = s3eTimerGetMs();
+    }
     
     //cache buster
     char buffer[50];
-    sprintf(buffer, "&cb=%lld", server_time);
+    sprintf(buffer, "&cb=%lld", cb);
     uri.append(buffer);
     
     onGoingRequest = new RequestData();
@@ -975,8 +975,8 @@ int32 RequestData::GotData(void*, void *userData)
                 break;
 		default:
 			IwTrace(PHUNE, ("Received data default"));
-			requestData->requestStatus = REQUEST_ERROR;
-			requestData->onResult(new RequestError(INVALID_RESPONSE_OBJECT, 0), requestData);
+			//requestData->requestStatus = REQUEST_ERROR;
+			//requestData->onResult(new RequestError(INVALID_RESPONSE_OBJECT, 0), requestData);
 			break;
 		}
 
