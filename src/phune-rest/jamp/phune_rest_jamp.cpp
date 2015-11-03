@@ -104,18 +104,24 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore sc
     //store the Cell performances
     for (std::map<int64, JsonListObject<JsonString> >::iterator itMap = map.begin(); itMap != map.end(); itMap++){
         
-        char buffer4[50];
-        sprintf(buffer4, "%s%lld", CELL_PERFORMACE_PREFIX, itMap->first);
-        std::string key_cell = std::string(buffer4);
+        if (itMap->first > 0) {
+            
+            char buffer4[50];
+            sprintf(buffer4, "%s%lld", CELL_PERFORMACE_PREFIX, itMap->first);
+            std::string key_cell = std::string(buffer4);
+            
+            std::string out = itMap->second.Serialize();
+            
+            IwTrace(PHUNE, ("Sending cell %lld begin", itMap->first));
+            
+            PhuneRestBase::StoreGameDataJsonBatch(s.c_str(), key_cell.c_str(), itMap->second.Serialize().c_str(), onNullReturn, onError, userData, true);
+            
+            IwTrace(PHUNE, ("Sending cell %lld end", itMap->first));
+        }
+        else{
+            IwTrace(PHUNE, ("Cell with invalid id:%lld. Ignoring...", itMap->first));
+        }
         
-        std::string out = itMap->second.Serialize();
-        
-        IwTrace(PHUNE, ("Sending cell %lld begin", itMap->first));
-        
-        PhuneRestBase::StoreGameDataJsonBatch(s.c_str(), key_cell.c_str(), itMap->second.Serialize().c_str(), onNullReturn, onError, userData, true);
-        
-        IwTrace(PHUNE, ("Sending cell %lld end", itMap->first));
-    
     }
     IwTrace(PHUNE, ("Sending cells end"));
     
