@@ -44,6 +44,13 @@ int32 JampPack::DeserializeFromValue(Value src){
 
 	if (!src["packLevels"].empty())
 		packLevels.DeserializeFromValue(src["packLevels"]);
+    
+    if (!src["packExecution"].empty())
+        packExecution = src["packExecution"].asInt64();
+    
+    if (!src["numberOfLevels"].empty())
+        numBlueStarsToUnlock = src["numberOfLevels"].asInt64();
+    
 
 	return 0;
 }
@@ -66,6 +73,9 @@ Value JampPack::SerializeToValue(){
     root["name"] = name;
     root["numBlueStarsToUnlock"] = numBlueStarsToUnlock;
     root["timeUnit"] = timeUnit;
+    
+    root["packExecution"] = packExecution;
+    root["numberOfLevels"] = numberOfLevels;
     
     root["packLevels"] = packLevels.SerializeToValue();
 

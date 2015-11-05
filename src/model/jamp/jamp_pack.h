@@ -35,6 +35,11 @@ public:
     std::string name;
     int64 numBlueStarsToUnlock;
     std::string timeUnit;
+    
+    //Percentage of complete
+    int64 packExecution
+    //Total number of levels
+    int64 numberOfLevels
 
 	//cells performances (ordered)
 	JsonListObject<JampPackLevel> packLevels;
