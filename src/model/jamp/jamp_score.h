@@ -22,13 +22,13 @@ public:
 
 public:
 	//The final score of a match in points
-	int64 score;
+	int64 score = -1;
 	//Time spent of the match
-	int64 timeSpent;
+	int64 timeSpent = -1;
 	//Time stamp of the server (automatic)
-	int64 timeStamp;
+	int64 timeStamp = -1;
 	//The match id (automatic)
-	int64 matchId;
+	int64 matchId = -1;
 
 	//cells performances
 	JsonListObject<JampCellPerformance> cellsPerformance;

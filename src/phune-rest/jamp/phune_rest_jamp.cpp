@@ -202,6 +202,20 @@ int32 PhuneRestJamp::StorePacksInGame(JampGameId gameId, JsonListObject<JampPack
 	char buffer[50];
 	sprintf(buffer, "%d", gameId);
 	std::string s = std::string(buffer);
+    
+    int64 totalStars = 0;
+    int64 starsWon = 0;
+    
+    for (std::vector<JampPack>::iterator it = packs.elements.begin(); it != packs.elements.end(); it++){
+        totalStars += it->starsMax;
+        starsWon += it->starsWon;
+    }
+    
+    JampGameProgress gp;
+    
+    gp.progress = (starsWon/(float)totalStars)*100;
+    
+    PhuneRestBase::StoreGameDataJson(s.c_str(), GAME_PROGRESS_KEY, gp.Serialize().c_str(), onNullReturn, onError, NULL);
 
 	return PhuneRestBase::StoreGameDataJsonList(s.c_str(), PACKS_KEY, packs, onResult, onError, userData);
 }

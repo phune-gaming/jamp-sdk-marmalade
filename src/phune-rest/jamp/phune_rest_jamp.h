@@ -5,6 +5,7 @@
 #include "../phune_rest.h"
 #include "../../model/jamp/jamp_score.h"
 #include "../../model/jamp/jamp_pack.h"
+#include "../../model/jamp/jamp_game_progress.h"
 #include "../../model/jamp/events/jamp_consecutive_perfects_event.h"
 #include "../../model/jamp/events/jamp_all_perfects_event.h"
 #include "../../model/json_list_object.h"
@@ -19,6 +20,7 @@
 #define CELL_PERFORMACE_PREFIX "CELL_"
 #define PACK_PREFIX "PACK_"
 #define PACKS_KEY "PACKS"
+#define GAME_PROGRESS_KEY "GAME_PROGRESS"
 
 enum JampGameId
 {

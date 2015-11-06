@@ -1,15 +1,14 @@
 #pragma once
-#ifndef JAMP_PACK_LEVEL
-#define JAMP_PACK_LEVEL
+#ifndef JAMP_GAME_PROGRESS
+#define JAMP_GAME_PROGRESS
 
 #include "json/json.h"
 #include "../json_object.h"
 
-#include <string>
 
 using namespace Json;
 
-class JampPackLevel :
+class JampGameProgress :
 	public JsonObject
 {
 public:
@@ -19,21 +18,11 @@ public:
 	virtual int32 DeserializeFromValue(Json::Value src) override;
 
 public:
-	//The id of the level
-	int64 levelId = -1;
-	//Stars won by the player in level
-	int64 starsWon = -1;
+	//percentages
+	float progress = -1;
 	
-	int64 maxScore = -1;
-
-	//level blocked
-	bool blocked;
-    
-    bool grouping;
-    
-    int64 packId = -1;
 
 };
 
-#endif // !JAMP_PACK_LEVEL
+#endif // !JAMP_GAME_PROGRESS
 

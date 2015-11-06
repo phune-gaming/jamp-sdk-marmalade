@@ -45,10 +45,14 @@ std::string JampScore::Serialize(){
 Value JampScore::SerializeToValue(){
 	Value root;
 
-	root["score"] = score;
-	root["timeSpent"] = timeSpent;
-	root["timeStamp"] = timeStamp;
-	root["matchId"] = matchId;
+    if(score >= 0)
+        root["score"] = score;
+    if(timeSpent >= 0)
+        root["timeSpent"] = timeSpent;
+    if(timeStamp >= 0)
+        root["timeStamp"] = timeStamp;
+    if(timeStamp >= 0)
+        root["matchId"] = matchId;
 
 	root["cellsPerformance"] = cellsPerformance.SerializeToValue();
 

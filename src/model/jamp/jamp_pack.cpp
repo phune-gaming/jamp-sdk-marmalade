@@ -64,18 +64,23 @@ std::string JampPack::Serialize(){
 Value JampPack::SerializeToValue(){
 	Value root;
 
-	root["packId"] = packId;
-	root["starsWon"] = starsWon;
-	root["starsMax"] = starsMax;
+    if(packId >= 0)
+        root["packId"] = packId;
+	if(starsWon >= 0)
+        root["starsWon"] = starsWon;
+	if(starsMax >= 0)
+        root["starsMax"] = starsMax;
 	root["blocked"] = blocked;
     root["figurationFlag"] = figurationFlag;
     root["figurationInfo"] = figurationInfo;
     root["name"] = name;
-    root["numBlueStarsToUnlock"] = numBlueStarsToUnlock;
+    if(numBlueStarsToUnlock >= 0)
+        root["numBlueStarsToUnlock"] = numBlueStarsToUnlock;
     root["timeUnit"] = timeUnit;
-    
-    root["packExecution"] = packExecution;
-    root["numberOfLevels"] = numberOfLevels;
+    if(numBlueStarsToUnlock >= 0)
+        root["packExecution"] = packExecution;
+    if(numberOfLevels >= 0)
+        root["numberOfLevels"] = numberOfLevels;
     
     root["packLevels"] = packLevels.SerializeToValue();
 

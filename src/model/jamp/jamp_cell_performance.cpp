@@ -77,11 +77,12 @@ Value JampCellPerformance::SerializeToValue(){
 
 	root["notesPerformance"] = notesPerformance.SerializeToValue();
 
-    root["bpm"] = bpm;
-    
-    root["level"] = level;
-    
-	root["timeStamp"] = timeStamp;
+    if(bpm >= 0)
+        root["bpm"] = bpm;
+    if(level >= 0)
+        root["level"] = level;
+    if(timeStamp >= 0)
+        root["timeStamp"] = timeStamp;
 
 	return root;
 }
