@@ -22,24 +22,24 @@ public:
 
 public:
 	//The id of the pack
-	int64 packId;
+	int64 packId = -1;
 	//Stars won by the player in pack
-	int64 starsWon;
+	int64 starsWon = -1;
 	//Maximum stars a player could achieve
-	int64 starsMax;
+	int64 starsMax = -1;
 	//Pack blocked
 	bool blocked;
     
     std::string figurationFlag;
     std::string figurationInfo;
     std::string name;
-    int64 numBlueStarsToUnlock;
+    int64 numBlueStarsToUnlock = -1;
     std::string timeUnit;
     
     //Percentage of complete
-    int64 packExecution;
+    int64 packExecution = -1;
     //Total number of levels
-    int64 numberOfLevels;
+    int64 numberOfLevels  = -1;
 
 	//cells performances (ordered)
 	JsonListObject<JampPackLevel> packLevels;

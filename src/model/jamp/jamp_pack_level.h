@@ -20,18 +20,18 @@ public:
 
 public:
 	//The id of the level
-	int64 levelId;
+	int64 levelId = -1;
 	//Stars won by the player in level
-	int64 starsWon;
+	int64 starsWon = -1;
 	
-	int64 maxScore;
+	int64 maxScore = -1;
 
 	//level blocked
 	bool blocked;
     
     bool grouping;
     
-    int64 packId;
+    int64 packId = -1;
 
 };
 

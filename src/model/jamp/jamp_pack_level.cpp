@@ -45,12 +45,16 @@ std::string JampPackLevel::Serialize(){
 Value JampPackLevel::SerializeToValue(){
 	Value root;
 
-	root["packId"] = levelId;
-	root["starsWon"] = starsWon;
-	root["maxScore"] = maxScore;
+    if(levelId >= 0)
+        root["levelId"] = levelId;
+    if(starsWon >= 0)
+        root["starsWon"] = starsWon;
+	if(maxScore >= 0)
+        root["maxScore"] = maxScore;
 	root["blocked"] = blocked;
     root["grouping"] = grouping;
-    root["packId"] = packId;
+    if(packId >= 0)
+        root["packId"] = packId;
 
 	return root;
 }
