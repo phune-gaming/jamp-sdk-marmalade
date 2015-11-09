@@ -45,6 +45,9 @@ int32 JampCellPerformance::DeserializeFromValue(Value src){
 
 	if (!src["timeStamp"].empty())
 		timeStamp = src["timeStamp"].asUInt64();
+    
+    if (!src["useNoteEvaluation"].empty())
+        useNoteEvaluation = src["useNoteEvaluation"].asBool();
 
 	return 0;
 }
@@ -83,6 +86,8 @@ Value JampCellPerformance::SerializeToValue(){
         root["level"] = level;
     if(timeStamp >= 0)
         root["timeStamp"] = timeStamp;
+    
+    root["useNoteEvaluation"] = useNoteEvaluation;
 
 	return root;
 }

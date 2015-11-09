@@ -33,5 +33,7 @@ public:
     int64 level = -1;
 	//Time stamp of the server (automatic)
 	int64 timeStamp = -1;
+    
+    bool useNoteEvaluation = false;
 };
 #endif // !JAMP_CELL_PERFORMANCE
