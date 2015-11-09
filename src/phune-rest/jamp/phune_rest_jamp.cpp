@@ -68,16 +68,34 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore sc
 	//aggregate cells performance
     for (std::vector<JampCellPerformance>::iterator it = score.cellsPerformance.elements.begin(); it != score.cellsPerformance.elements.end(); it++){
         
-        if (it->classification == PERFECT) {
-            consecutivePerfects++;
-        }
-        else{
-            allPerfects = false;
-            if(consecutivePerfects > 3 && consecutivePerfects > bestSequence){
-                bestSequence = consecutivePerfects;
+        //Use the notes for events
+        if(it->useNoteEvaluation){
+            for (std::vector<JampNotePerformance>::iterator it2 = it->notesPerformance.elements.begin(); it2 != it->notesPerformance.elements.end(); it2++){
+                if (it2->classification == PERFECT) {
+                    consecutivePerfects++;
+                }
+                else{
+                    allPerfects = false;
+                    if(consecutivePerfects > 3 && consecutivePerfects > bestSequence){
+                        bestSequence = consecutivePerfects;
+                    }
+                    consecutivePerfects = 0;
+                }
             }
             
-            consecutivePerfects = 0;
+        }
+        //use the cell for events
+        else{
+            if (it->classification == PERFECT) {
+                consecutivePerfects++;
+            }
+            else{
+                allPerfects = false;
+                if(consecutivePerfects > 3 && consecutivePerfects > bestSequence){
+                    bestSequence = consecutivePerfects;
+                }
+                consecutivePerfects = 0;
+            }
         }
 
         
@@ -131,8 +149,8 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore sc
     JsonListObject<GameTriggerdEvent> events;
     
     //consecutive perfects
-    if(consecutivePerfects != -1){
-        ConsecutivePerfectsEvent cpe(consecutivePerfects, gameId);
+    if(bestSequence != -1){
+        ConsecutivePerfectsEvent cpe(bestSequence, gameId);
         
         cpe.playerId = currentMatch->playerId;
         
