@@ -790,20 +790,6 @@ int32 RequestData::GotHeaders(void*, void *userData)
 		requestData->onResult(new RequestError(REQUEST_ERROR, requestData->http_object->GetResponseCode()), requestData);
 		return 0;
 	}
-	
-	if (requestData->responseObjectType == NONE || requestData->http_object->GetResponseCode() == 204){
-		IwTrace(PHUNE, ("on got headers NONE or No content"));
-		//read data for 0 bytes
-		requestData->http_object->ReadData(NULL, 0);
-        
-        requestData->http_object->Cancel();
-        //requestData->http_object = NULL;
-        
-		requestData->requestStatus = NO_CONTENT;
-        requestData->onResult(NULL, requestData);
-        return 0;
-	}
-    
 	else
 	{
 		std::string strCookie;
@@ -831,6 +817,7 @@ int32 RequestData::GotHeaders(void*, void *userData)
 			requestData->http_object->SetRequestHeader("Authorization", authorization_prefix.c_str());
 		}
         
+        
         if(requestData->responseObjectType == PHUNE_REDIRECT_LOGIN){
             int tmp = FINISHED;
             IwTrace(PHUNE, ("on got headers NONE or No content"));
@@ -844,6 +831,20 @@ int32 RequestData::GotHeaders(void*, void *userData)
             requestData->onResult(&tmp, requestData);
             return 0;
         }
+        
+        if (requestData->responseObjectType == NONE || requestData->http_object->GetResponseCode() == 204){
+            IwTrace(PHUNE, ("on got headers NONE or No content"));
+            //read data for 0 bytes
+            requestData->http_object->ReadData(NULL, 0);
+            
+            requestData->http_object->Cancel();
+            //requestData->http_object = NULL;
+            
+            requestData->requestStatus = NO_CONTENT;
+            requestData->onResult(NULL, requestData);
+            return 0;
+        }
+
 
 		requestData->len = requestData->http_object->ContentExpected();
 		if (!requestData->len)
