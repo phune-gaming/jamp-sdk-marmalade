@@ -34,43 +34,44 @@ int32 PhuneRestJamp::StartMatch(JampGameId gameId, s3eCallback onResult, s3eCall
 }
 
 int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore score, PlayerStatus status, s3eCallback onResult, s3eCallback onError, void *userData){
-	if (currentMatch == NULL){
-		onError(NULL, NULL);
-		return 0;
-	}
-	char buffer[50];
-	sprintf(buffer, "%d", gameId);
-	std::string s = std::string(buffer);
-
-	std::string s3 = std::string(SCORE_LEVEL_KEY_PREFIX);
-	s3.append(level);
-
-	
-	score.matchId = currentMatch->matchId;
-	
-
-
-	PhunePlayer player;
-	player.score = score.score;
-	player.status = status;
-	player.id = currentMatch->playerId;
-
-	int64 t = getCurrentTime();
-
-	//Send the result of the match
-	PhuneRest::EndMatch(score.matchId, player, onNullReturn, onError);
-
+    if (currentMatch == NULL){
+        onError(NULL, NULL);
+        return 0;
+    }
+    char buffer[50];
+    sprintf(buffer, "%d", gameId);
+    std::string s = std::string(buffer);
+    
+    std::string s3 = std::string(SCORE_LEVEL_KEY_PREFIX);
+    s3.append(level);
+    
+    
+    score.matchId = currentMatch->matchId;
+    
+    
+    
+    PhunePlayer player;
+    player.score = score.score;
+    player.status = status;
+    player.id = currentMatch->playerId;
+    
+    int64 t = getCurrentTime();
+    
+    //Send the result of the match
+    PhuneRest::EndMatch(score.matchId, player, onResult, onError, userData);
+    
     IwTrace(PHUNE, ("Creating map begin"));
     std::map<int64, JsonListObject<JsonString> > map;
     int consecutivePerfects = 0;
     int bestSequence = -1;
     bool allPerfects = true;
-	//aggregate cells performance
+    //aggregate cells performance
     for (std::vector<JampCellPerformance>::iterator it = score.cellsPerformance.elements.begin(); it != score.cellsPerformance.elements.end(); it++){
         
         //Use the notes for events
         if(it->useNoteEvaluation){
             for (std::vector<JampNotePerformance>::iterator it2 = it->notesPerformance.elements.begin(); it2 != it->notesPerformance.elements.end(); it2++){
+                
                 if (it2->classification == PERFECT) {
                     consecutivePerfects++;
                 }
@@ -174,16 +175,16 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore sc
     if(events.elements.size() > 0){
         PhuneRest::StoreMatchEvents(events, score.matchId, onNullReturn, onError);
     }
-
-
-	//store the score for the match
-	score.timeStamp = t;
-	PhuneRestBase::StoreGameDataJson(s.c_str(), s3.c_str(), score.Serialize().c_str(), onResult, onError, userData, true);
-	
     
     
-	currentMatch = NULL;
-
+    //store the score for the match
+    score.timeStamp = t;
+    PhuneRestBase::StoreGameDataJson(s.c_str(), s3.c_str(), score.Serialize().c_str(), onNullReturn, onError, NULL, true);
+    
+    
+    
+    currentMatch = NULL;
+    
 	return 0;
 }
 
