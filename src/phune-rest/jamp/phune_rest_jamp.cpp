@@ -117,6 +117,11 @@ int32 PhuneRestJamp::EndMatch(JampGameId gameId, std::string level, JampScore sc
             map.find(it->cellId)->second.pushElement(js2);
         }
     }
+    
+    if(consecutivePerfects > 3 && consecutivePerfects > bestSequence){
+        bestSequence = consecutivePerfects;
+    }
+    
     IwTrace(PHUNE, ("Creating map end"));
     IwTrace(PHUNE, ("Sending cells begin"));
     //store the Cell performances
