@@ -91,6 +91,22 @@ int32 PhuneRestBase::_Init(s3eCallback onResult, s3eCallback onError, void *user
         }
         
     }
+    
+    if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
+    {
+        pendingRequest pr;
+        pr.onError = onError;
+        pr.onResult = onResult;
+        pr.resource = std::string("/jamp/utils/time");
+        pr.responseObjectType = PHUNE_TIMESTAMP;
+        pr.sendType = CIwHTTP::GET;
+        pr.userData = userData;
+        pendingRequests().push_back(pr);
+        
+        return 0;
+    }
+
+    
 	char resource[200];
 	std::memset(resource, 0, sizeof(resource));
 	sprintf(resource, "/jamp/utils/time");
