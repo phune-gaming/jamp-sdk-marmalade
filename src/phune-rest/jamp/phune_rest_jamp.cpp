@@ -239,9 +239,13 @@ int32 PhuneRestJamp::StorePacksInGame(JampGameId gameId, JsonListObject<JampPack
     
     gp.progress = (starsWon/(float)totalStars)*100;
     
-    PhuneRestBase::StoreGameDataJson(s.c_str(), GAME_PROGRESS_KEY, gp.Serialize().c_str(), onNullReturn, onError, NULL);
+    
 
-	return PhuneRestBase::StoreGameDataJsonList(s.c_str(), PACKS_KEY, packs, onResult, onError, userData);
+    PhuneRestBase::StoreGameDataJsonList(s.c_str(), PACKS_KEY, packs, onResult, onError, userData);
+    
+    PhuneRestBase::StoreGameDataJson(s.c_str(), GAME_PROGRESS_KEY, gp.Serialize().c_str(), onNullReturn, onError, NULL, false);
+    
+    return 0;
 }
 
 int32 PhuneRestJamp::GetPacksInGame(JampGameId gameId, s3eCallback onResult, s3eCallback onError, void *userData){
