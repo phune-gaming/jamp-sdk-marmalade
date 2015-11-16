@@ -9,7 +9,12 @@ s3eCallback PhuneRestBase::_onError;
 PhuneRestBase::PhuneRestBase()
 {
 
-	http_object = new CIwHTTP;
+    http_object = new CIwHTTP;
+    
+   
+    pthread_mutex_init (&mutex, NULL);
+  
+    
 
 	//http_object->SetRequestHeader("Cache-Control", "max-age=0");
 	http_object->SetRequestHeader("Accept", "application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
@@ -58,11 +63,11 @@ PhuneRestBase::PhuneRestBase()
 
 PhuneRestBase::~PhuneRestBase()
 {
-	if (onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
+	/*if (onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
 	{
 		delete onGoingRequest;
 		onGoingRequest = NULL;
-	}
+	}*/
 
 	if (http_object)
 	{
@@ -92,19 +97,22 @@ int32 PhuneRestBase::_Init(s3eCallback onResult, s3eCallback onError, void *user
         
     }
     
-    if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
+    pendingRequest pr;
+    pr.onError = onError;
+    pr.onResult = onResult;
+    pr.resource = std::string("/jamp/utils/time");
+    pr.responseObjectType = PHUNE_TIMESTAMP;
+    pr.sendType = CIwHTTP::GET;
+    pr.userData = userData;
+    
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    if (pendingRequests().size() > 1)
     {
-        pendingRequest pr;
-        pr.onError = onError;
-        pr.onResult = onResult;
-        pr.resource = std::string("/jamp/utils/time");
-        pr.responseObjectType = PHUNE_TIMESTAMP;
-        pr.sendType = CIwHTTP::GET;
-        pr.userData = userData;
-        pendingRequests().push_back(pr);
-        
+        pthread_mutex_unlock(&mutex);
         return 0;
     }
+    pthread_mutex_unlock(&mutex);
 
     
 	char resource[200];
@@ -115,7 +123,7 @@ int32 PhuneRestBase::_Init(s3eCallback onResult, s3eCallback onError, void *user
 	_onError = onError;
 
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_TIMESTAMP, NULL, userData);
+	new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_TIMESTAMP, NULL, userData);
 
 	return 0;
 }
@@ -123,25 +131,23 @@ int32 PhuneRestBase::_Init(s3eCallback onResult, s3eCallback onError, void *user
 int32 PhuneRestBase::_Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCallback onError, void *userData){
 	std::string  uri;
 	uri.append(URL_SCHEMA);
-	//uri.append("s");
 	uri.append("://");
 	uri.append(URL_HOST);
-	//uri->append(":");
-	//uri->append(URL_PORT);
 	uri.append(URL_CONTEXT);
 	uri.append(LOGIN_RESOURCE);
-	//uri.append("?");
-	//uri.append(LOGIN_REDIRECT_LOGOUT);
-    
-    
-    onGoingRequest = new RequestData();
-    onGoingRequest->requestStatus = ONGOING_REQUEST;
 
-	onGoingRequest->userData = userData;
+    
+    pendingRequest pr;
+    pr.userData = userData;
+    pr.onError = onError;
+    pr.onResult = onResult;
+    
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    pthread_mutex_unlock(&mutex);
 
 	_onResult = onResult;
 	_onError = onError;
-	pendingUserData = userData;
 
 	
 	//PhuneRestBase::onWebView = _onWebView;
@@ -200,14 +206,16 @@ int32 PhuneRestBase::_Logout(s3eCallback onResult, s3eCallback onError, void *us
     sprintf(buffer, "&cb=%lld", cb);
     uri.append(buffer);
     
-    onGoingRequest = new RequestData();
-    onGoingRequest->requestStatus = ONGOING_REQUEST;
+    pendingRequest pr;
+    pr.userData = userData;
     
-    onGoingRequest->userData = userData;
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    pthread_mutex_unlock(&mutex);
     
     _onResult = onResult;
     _onError = onError;
-    pendingUserData = userData;
+    
     
     s3eWebView *g_WebView = s3eWebViewCreate();
     
@@ -248,26 +256,28 @@ int32 PhuneRestBase::_Logout(s3eCallback onResult, s3eCallback onError, void *us
 
 int32 PhuneRestBase::_GetMe(s3eCallback onResult, s3eCallback onError, void *userData){
 
-	if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
-	{
-		pendingRequest pr;
-		pr.onError = onError;
-		pr.onResult = onResult;
-		pr.resource = std::string("/me");
-		pr.responseObjectType = PHUNE_USER_OBJECT;
-		pr.sendType = CIwHTTP::GET;
-		pr.userData = userData;
-		pendingRequests().push_back(pr);
+    pendingRequest pr;
+    pr.onError = onError;
+    pr.onResult = onResult;
+    pr.resource = std::string("/me");
+    pr.responseObjectType = PHUNE_USER_OBJECT;
+    pr.sendType = CIwHTTP::GET;
+    pr.userData = userData;
 
-		return 0;
-	}
-
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    if (pendingRequests().size() > 1)
+    {
+        pthread_mutex_unlock(&mutex);
+        return 0;
+    }
+    pthread_mutex_unlock(&mutex);
 	
 
 	_onResult = onResult;
 	_onError = onError;
 	
-	onGoingRequest = new RequestData("/me", http_object, CIwHTTP::GET, GotResult, PHUNE_USER_OBJECT, NULL, userData);
+	new RequestData("/me", http_object, CIwHTTP::GET, GotResult, PHUNE_USER_OBJECT, NULL, userData);
 
 
 	return 0;
@@ -279,26 +289,29 @@ int32 PhuneRestBase::StoreGameDataBase64(const char *gameId, const char *key, un
 	std::memset(resource, 0, sizeof(resource));
 	sprintf(resource, "/jamp/me/preferences/%s?gameId=%s", key, gameId);
 
-	if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
-	{
-		pendingRequest pr;
-		pr.body = base64_encode(bytes_to_encode, strlen((char*)bytes_to_encode));
-		pr.onError = onError;
-		pr.onResult = onResult;
-		pr.resource = std::string(resource);
-		pr.responseObjectType = NONE;
-		pr.sendType = CIwHTTP::PUT;
-		pr.userData = userData;
-		pendingRequests().push_back(pr);
-
-		return 0;
-	}
+    pendingRequest pr;
+    pr.body = base64_encode(bytes_to_encode, strlen((char*)bytes_to_encode));
+    pr.onError = onError;
+    pr.onResult = onResult;
+    pr.resource = std::string(resource);
+    pr.responseObjectType = NONE;
+    pr.sendType = CIwHTTP::PUT;
+    pr.userData = userData;
+    
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    if (pendingRequests().size() > 1)
+    {
+        pthread_mutex_unlock(&mutex);
+        return 0;
+    }
+    pthread_mutex_unlock(&mutex);
     
 	_onResult = onResult;
 	_onError = onError;
 
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, base64_encode(bytes_to_encode, strlen((char*)bytes_to_encode)).c_str(), userData);
+	new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, base64_encode(bytes_to_encode, strlen((char*)bytes_to_encode)).c_str(), userData);
 
 	return 0;
 }
@@ -315,28 +328,29 @@ int32 PhuneRestBase::StoreGameDataJsonBatch(const char *gameId, const char *key,
         sprintf(resource, "/jamp/me/preferences/%s/batch?gameId=%s", key, gameId);
     }
     
-    if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
+    pendingRequest pr;
+    pr.body = jsonObject;
+    pr.onError = onError;
+    pr.onResult = onResult;
+    pr.resource = std::string(resource);
+    pr.responseObjectType = NONE;
+    pr.sendType = CIwHTTP::PUT;
+    pr.userData = userData;
+    
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    if (pendingRequests().size() > 1)
     {
-        pendingRequest pr;
-        pr.body = jsonObject;
-        pr.onError = onError;
-        pr.onResult = onResult;
-        pr.resource = std::string(resource);
-        pr.responseObjectType = NONE;
-        pr.sendType = CIwHTTP::PUT;
-        pr.userData = userData;
-        pendingRequests().push_back(pr);
-        
+        pthread_mutex_unlock(&mutex);
         return 0;
     }
-    
-    
+    pthread_mutex_unlock(&mutex);
     
     _onResult = onResult;
     _onError = onError;
     
     
-    onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonObject, userData);
+    new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonObject, userData);
     
     return 0;
 
@@ -355,29 +369,31 @@ int32 PhuneRestBase::StoreGameDataJson(const char *gameId, const char *key, cons
 	{
 		sprintf(resource, "/jamp/me/preferences/%s?gameId=%s", key, gameId);
 	}
+    
+    pendingRequest pr;
+    pr.body = jsonObject;
+    pr.onError = onError;
+    pr.onResult = onResult;
+    pr.resource = std::string(resource);
+    pr.responseObjectType = NONE;
+    pr.sendType = CIwHTTP::PUT;
+    pr.userData = userData;
 
-	if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
-	{
-		pendingRequest pr;
-		pr.body = jsonObject;
-		pr.onError = onError;
-		pr.onResult = onResult;
-		pr.resource = std::string(resource);
-		pr.responseObjectType = NONE;
-		pr.sendType = CIwHTTP::PUT;
-		pr.userData = userData;
-		pendingRequests().push_back(pr);
-
-		return 0;
-	}
-
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    if (pendingRequests().size() > 1)
+    {
+        pthread_mutex_unlock(&mutex);
+        return 0;
+    }
+    pthread_mutex_unlock(&mutex);
 	
 
 	_onResult = onResult;
 	_onError = onError;
 
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonObject, userData);
+	new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonObject, userData);
 
 	return 0;
 }
@@ -388,26 +404,28 @@ int32 PhuneRestBase::GetGameDataBase64(const char *gameId, const char *key, s3eC
 	std::memset(resource, 0, sizeof(resource));
 	sprintf(resource, "/jamp/me/preferences/%s?gameId=%s", key, gameId);
 
-	if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
-	{
-		pendingRequest pr;
-		pr.onError = onError;
-		pr.onResult = onResult;
-		pr.resource = std::string(resource);
-		pr.responseObjectType = PHUNE_PREFERENCE_OBJECT;
-		pr.sendType = CIwHTTP::GET;
-		pr.userData = userData;
-		pendingRequests().push_back(pr);
+    pendingRequest pr;
+    pr.onError = onError;
+    pr.onResult = onResult;
+    pr.resource = std::string(resource);
+    pr.responseObjectType = PHUNE_PREFERENCE_OBJECT;
+    pr.sendType = CIwHTTP::GET;
+    pr.userData = userData;
 
-		return 0;
-	}
-
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    if (pendingRequests().size() > 1)
+    {
+        pthread_mutex_unlock(&mutex);
+        return 0;
+    }
+    pthread_mutex_unlock(&mutex);
 	
 	_onResult = onResult;
 	_onError = onError;
 
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_PREFERENCE_OBJECT, NULL, userData);
+	new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_PREFERENCE_OBJECT, NULL, userData);
 
 	return 0;
 }
@@ -418,26 +436,28 @@ int32 PhuneRestBase::GetGameDataJson(const char *gameId, const char *key, s3eCal
 	std::memset(resource, 0, sizeof(resource));
 	sprintf(resource, "/jamp/me/preferences/%s?gameId=%s", key, gameId);
 
-	if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
-	{
-		pendingRequest pr;
-		pr.onError = onError;
-		pr.onResult = onResult;
-		pr.resource = std::string(resource);
-		pr.responseObjectType = PHUNE_PREFERENCE_JSON;
-		pr.sendType = CIwHTTP::GET;
-		pr.userData = userData;
-		pendingRequests().push_back(pr);
-
-		return 0;
-	}
-
+    pendingRequest pr;
+    pr.onError = onError;
+    pr.onResult = onResult;
+    pr.resource = std::string(resource);
+    pr.responseObjectType = PHUNE_PREFERENCE_JSON;
+    pr.sendType = CIwHTTP::GET;
+    pr.userData = userData;
+    
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    if (pendingRequests().size() > 1)
+    {
+        pthread_mutex_unlock(&mutex);
+        return 0;
+    }
+    pthread_mutex_unlock(&mutex);
 	
 	_onResult = onResult;
 	_onError = onError;
 
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_PREFERENCE_JSON, NULL, userData);
+	new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_PREFERENCE_JSON, NULL, userData);
 
 	return 0;
 }
@@ -448,26 +468,28 @@ int32 PhuneRestBase::GetGameDataJsonList(const char *gameId, const char *key, s3
 	std::memset(resource, 0, sizeof(resource));
 	sprintf(resource, "/jamp/me/preferences/%s?gameId=%s", key, gameId);
 
-	if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
-	{
-		pendingRequest pr;
-		pr.onError = onError;
-		pr.onResult = onResult;
-		pr.resource = std::string(resource);
-		pr.responseObjectType = PHUNE_PREFERENCE_JSON_LIST;
-		pr.sendType = CIwHTTP::GET;
-		pr.userData = userData;
-		pendingRequests().push_back(pr);
+    pendingRequest pr;
+    pr.onError = onError;
+    pr.onResult = onResult;
+    pr.resource = std::string(resource);
+    pr.responseObjectType = PHUNE_PREFERENCE_JSON_LIST;
+    pr.sendType = CIwHTTP::GET;
+    pr.userData = userData;
 
-		return 0;
-	}
-
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    if (pendingRequests().size() > 1)
+    {
+        pthread_mutex_unlock(&mutex);
+        return 0;
+    }
+    pthread_mutex_unlock(&mutex);
 	
 
 	_onResult = onResult;
 	_onError = onError;
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_PREFERENCE_JSON_LIST, NULL, userData);
+	new RequestData(resource, http_object, CIwHTTP::GET, GotResult, PHUNE_PREFERENCE_JSON_LIST, NULL, userData);
 
 	return 0;
 }
@@ -478,26 +500,29 @@ int32 PhuneRestBase::DeleteGameData(const char *gameId, const char *key, s3eCall
 	std::memset(resource, 0, sizeof(resource));
 	sprintf(resource, "/jamp/me/preferences/%s?gameId=%s", key, gameId);
 
-	if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
-	{
-		pendingRequest pr;
-		pr.onError = onError;
-		pr.onResult = onResult;
-		pr.resource = (char*)s3eMalloc(sizeof(resource));
-		pr.resource = std::string(resource);
-		pr.sendType = CIwHTTP::DELETE;
-		pr.userData = userData;
-		pendingRequests().push_back(pr);
-
-		return 0;
-	}
+    pendingRequest pr;
+    pr.onError = onError;
+    pr.onResult = onResult;
+    pr.resource = (char*)s3eMalloc(sizeof(resource));
+    pr.resource = std::string(resource);
+    pr.sendType = CIwHTTP::DELETE;
+    pr.userData = userData;
+    
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    if (pendingRequests().size() > 1)
+    {
+        pthread_mutex_unlock(&mutex);
+        return 0;
+    }
+    pthread_mutex_unlock(&mutex);
 
 	
 	_onResult = onResult;
 	_onError = onError;
 
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::DELETE, GotResult, NONE, NULL, userData);
+	new RequestData(resource, http_object, CIwHTTP::DELETE, GotResult, NONE, NULL, userData);
 
 	return 0;
 }
@@ -510,27 +535,29 @@ int32 PhuneRestBase::_StartMatch(const char *gameId, s3eCallback onResult, s3eCa
 	std::memset(resource, 0, sizeof(resource));
 	sprintf(resource, "/jamp/matches");
 
-	if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
-	{
-		pendingRequest pr;
-		pr.body = std::string(gameId);
-		pr.onError = onError;
-		pr.onResult = onResult;
-		pr.resource = std::string(resource);
-		pr.responseObjectType = PHUNE_MATCH_OBJECT;
-		pr.sendType = CIwHTTP::POST;
-		pr.userData = userData;
-		pendingRequests().push_back(pr);
+    pendingRequest pr;
+    pr.body = std::string(gameId);
+    pr.onError = onError;
+    pr.onResult = onResult;
+    pr.resource = std::string(resource);
+    pr.responseObjectType = PHUNE_MATCH_OBJECT;
+    pr.sendType = CIwHTTP::POST;
+    pr.userData = userData;
 
-		return 0;
-	}
-
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    if (pendingRequests().size() > 1)
+    {
+        pthread_mutex_unlock(&mutex);
+        return 0;
+    }
+    pthread_mutex_unlock(&mutex);
 	
 
 	_onResult = onResult;
 	_onError = onError;
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::POST, GotResult, PHUNE_MATCH_OBJECT, gameId, userData);
+	new RequestData(resource, http_object, CIwHTTP::POST, GotResult, PHUNE_MATCH_OBJECT, gameId, userData);
     
     return 0;
 }
@@ -540,28 +567,30 @@ int32 PhuneRestBase::_EndMatch(int64 matchId, PhunePlayer player, s3eCallback on
 	sprintf(resource, "/jamp/matches/%lld/finish", matchId);
 
 	IwTrace(PHUNE, ("End match:%s", player.Serialize().c_str()));
-	if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
-	{
-		pendingRequest pr;
+    
+    pendingRequest pr;
+    pr.body = player.Serialize();
+    pr.onError = onError;
+    pr.onResult = onResult;
+    pr.resource = std::string(resource);
+    pr.responseObjectType = NONE;
+    pr.sendType = CIwHTTP::PUT;
+    pr.userData = userData;
 
-		pr.body = player.Serialize();
-		pr.onError = onError;
-		pr.onResult = onResult;
-		pr.resource = std::string(resource);
-		pr.responseObjectType = NONE;
-		pr.sendType = CIwHTTP::PUT;
-		pr.userData = userData;
-		pendingRequests().push_back(pr);
-
-		return 0;
-	}
-
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    if (pendingRequests().size() > 1)
+    {
+        pthread_mutex_unlock(&mutex);
+        return 0;
+    }
+    pthread_mutex_unlock(&mutex);
 	
 
 	_onResult = onResult;
 	_onError = onError;
 
-	onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, player.Serialize().c_str(), userData);
+	new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, player.Serialize().c_str(), userData);
 
     return 0;
 }
@@ -572,28 +601,29 @@ int32 PhuneRestBase::_StoreMatchEvents(JsonListObject<GameTriggerdEvent> events,
     sprintf(resource, "/jamp/matches/%lld/events", matchId);
     
     IwTrace(PHUNE, ("Store events:%s", events.Serialize().c_str()));
-    if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
+    
+    pendingRequest pr;
+    pr.body = events.Serialize();
+    pr.onError = onError;
+    pr.onResult = onResult;
+    pr.resource = std::string(resource);
+    pr.responseObjectType = NONE;
+    pr.sendType = CIwHTTP::PUT;
+    pr.userData = userData;
+   
+    pthread_mutex_lock(&mutex);
+    pendingRequests().push_back(pr);
+    if (pendingRequests().size() > 1)
     {
-        pendingRequest pr;
-        
-        pr.body = events.Serialize();
-        pr.onError = onError;
-        pr.onResult = onResult;
-        pr.resource = std::string(resource);
-        pr.responseObjectType = NONE;
-        pr.sendType = CIwHTTP::PUT;
-        pr.userData = userData;
-        pendingRequests().push_back(pr);
-        
+        pthread_mutex_unlock(&mutex);
         return 0;
     }
-    
-    
+    pthread_mutex_unlock(&mutex);
     
     _onResult = onResult;
     _onError = onError;
     
-    onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, events.Serialize().c_str(), userData);
+    new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, events.Serialize().c_str(), userData);
     
     return 0;
 }
@@ -625,11 +655,15 @@ int32 PhuneRestBase::GotResult(void *result, void *userData){
 			PhuneRestBase::_onResult(result, requestData->userData);
 		}
 		requestData->requestStatus = READY;
-		delete requestData;
-		requestData = NULL;
+		
 
+        pthread_mutex_lock(&mutex);
+        //remove the first element of the list
+        pendingRequests().pop_front();
 		//empty List of pending requests
 		if (pendingRequests().empty()){
+            delete requestData;
+            requestData = NULL;
 			//has finished the pending requests
 			IwTrace(PHUNE, ("There are no pending requests"));
 		}
@@ -640,16 +674,13 @@ int32 PhuneRestBase::GotResult(void *result, void *userData){
 			for (std::deque<pendingRequest>::iterator it = pendingRequests().begin(); it != pendingRequests().end(); ++it){
 				IwTrace(PHUNE, ("resource:%s", it->resource.c_str()));
 			}
-
-			//remove the first element of the list
 			pendingRequest pr = pendingRequests().front();
-			pendingRequests().pop_front();
-			
 			PhuneRestBase::_onResult = pr.onResult;
 			PhuneRestBase::_onError = pr.onError;
 
 			requestData = new RequestData(pr.resource.c_str(), httpObject, pr.sendType, GotResult, pr.responseObjectType, pr.body.c_str(), pr.userData);
 		}
+        pthread_mutex_unlock(&mutex);
 	}
 	return 0;
 }
@@ -665,8 +696,13 @@ int32 PhuneRestBase::_onHideWebView(s3eWebView *instance, void *systemData, void
 	if (out.find(LOGIN_REDIRECT) != string::npos){
 		IwTrace(PHUNE, ("PhuneRestBase::onHideWebView Found login Redirect:%s", out.c_str()));
 		
+        pthread_mutex_lock(&mutex);
+        pendingRequest pr = pendingRequests().front();
+        pendingRequests().pop_front();
+        pthread_mutex_unlock(&mutex);
+        
 		int tmp = STOP_VIEW;
-		_onResult(&tmp, object->pendingUserData);
+		_onResult(&tmp, pr.userData);
 
 		std::string prefix = string();
 
@@ -680,8 +716,6 @@ int32 PhuneRestBase::_onHideWebView(s3eWebView *instance, void *systemData, void
 		if (pos != string::npos){
 			out.erase(pos);
 		}
-		
-        delete object->onGoingRequest;
         
 		IwTrace(PHUNE, ("PhuneRestBase::onHideWebView erasing %ld chars:%s",prefix.length(), prefix.c_str()));
 		out.erase(0, prefix.length());
@@ -689,8 +723,18 @@ int32 PhuneRestBase::_onHideWebView(s3eWebView *instance, void *systemData, void
 		IwTrace(PHUNE, ("PhuneRestBase::onHideWebView after cleaning request:%s", out.c_str()));
 
 		s3eWebViewUnRegister(S3E_WEBVIEW_FINISHED_LOADING, _onHideWebView, instance);
+        
+        
+        pthread_mutex_lock(&mutex);
+        pendingRequests().push_back(pr);
+        if (pendingRequests().size() > 1)
+        {
+            pthread_mutex_unlock(&mutex);
+            return 0;
+        }
+        pthread_mutex_unlock(&mutex);
 
-		object->onGoingRequest = new RequestData(out.c_str(), object->http_object, CIwHTTP::GET, object->GotResult, PHUNE_REDIRECT_LOGIN, NULL, object->pendingUserData);
+		new RequestData(out.c_str(), object->http_object, CIwHTTP::GET, object->GotResult, PHUNE_REDIRECT_LOGIN, NULL, pr.userData);
 
 		
 	}
@@ -707,11 +751,17 @@ int32 PhuneRestBase::_onLogoutWebView(s3eWebView *instance, void *systemData, vo
     std::string out = string(static_cast<const char*>(systemData));
     
     if (out.find(LOGOUT_FACEBOOK_REDIRECT)==0){
+        
+        pthread_mutex_lock(&mutex);
+        pendingRequest pr = pendingRequests().front();
+        pendingRequests().pop_front();
+        pthread_mutex_unlock(&mutex);
+        
         s3eWebViewUnRegister(S3E_WEBVIEW_FINISHED_LOADING, _onLogoutWebView, instance);
         //s3eWebViewClearCache(instance);
         s3eWebViewDestroy(instance);
     
-        _onResult(NULL, object->pendingUserData);
+        _onResult(NULL, pr.userData);
     }
     
     
@@ -836,14 +886,15 @@ int32 RequestData::GotHeaders(void*, void *userData)
         
         if(requestData->responseObjectType == PHUNE_REDIRECT_LOGIN){
             int tmp = FINISHED;
-            IwTrace(PHUNE, ("on got headers NONE or No content"));
+            IwTrace(PHUNE, ("on got headers PHUNE_REDIRECT_LOGIN"));
+            requestData->requestStatus = NO_CONTENT;
             //read data for 0 bytes
             requestData->http_object->ReadData(NULL, 0);
             
             requestData->http_object->Cancel();
             //requestData->http_object = NULL;
             
-            requestData->requestStatus = NO_CONTENT;
+            
             requestData->onResult(&tmp, requestData);
             return 0;
         }
@@ -851,12 +902,13 @@ int32 RequestData::GotHeaders(void*, void *userData)
         if (requestData->responseObjectType == NONE || requestData->http_object->GetResponseCode() == 204){
             IwTrace(PHUNE, ("on got headers NONE or No content"));
             //read data for 0 bytes
+            requestData->requestStatus = NO_CONTENT;
             requestData->http_object->ReadData(NULL, 0);
             
             requestData->http_object->Cancel();
             //requestData->http_object = NULL;
             
-            requestData->requestStatus = NO_CONTENT;
+            
             requestData->onResult(NULL, requestData);
             return 0;
         }
@@ -964,11 +1016,17 @@ int32 RequestData::GotData(void*, void *userData)
 			requestData->onResult(ppb, requestData);
 			break;
 		case PHUNE_PREFERENCE_JSON:
+            IwTrace(PHUNE, ("Received data. Parsing PHUNE_PREFERENCE_JSON"));
+            pp = new PhunePreference();
+            pp->Deserialize(std::string(requestData->result));
+            IwTrace(PHUNE, ("Received data. Parsed PHUNE_PREFERENCE_JSON"));
+            requestData->onResult(pp, requestData);
+            break;
 		case PHUNE_PREFERENCE_JSON_LIST:
-			IwTrace(PHUNE, ("Received data. Parsing PHUNE_PREFERENCE_JSON or PHUNE_PREFERENCE_JSON_LIST"));
+			IwTrace(PHUNE, ("Received data. Parsing PHUNE_PREFERENCE_JSON_LIST"));
 			pp = new PhunePreference();
 			pp->Deserialize(std::string(requestData->result));
-			IwTrace(PHUNE, ("Received data. Parsed PHUNE_PREFERENCE_JSON or PHUNE_PREFERENCE_JSON_LIST"));
+			IwTrace(PHUNE, ("Received data. Parsed PHUNE_PREFERENCE_JSON_LIST"));
 			requestData->onResult(pp, requestData);
 			break;
 		case PHUNE_TIMESTAMP:
@@ -987,9 +1045,13 @@ int32 RequestData::GotData(void*, void *userData)
 			requestData->onResult(&tmp, requestData);
 			break;
         case PHUNE_LOGOUT:
-                IwTrace(PHUNE, ("Received data PHUNE_LOGOUT"));
-                requestData->onResult(NULL, requestData);
-                break;
+            IwTrace(PHUNE, ("Received data PHUNE_LOGOUT"));
+            requestData->onResult(NULL, requestData);
+            break;
+        case NONE:
+            IwTrace(PHUNE, ("Received data NONE"));
+            requestData->onResult(NULL, requestData);
+            break;
 		default:
 			IwTrace(PHUNE, ("Received data default"));
 			//requestData->requestStatus = REQUEST_ERROR;

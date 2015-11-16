@@ -10,6 +10,7 @@
 #include <deque>
 #include <ctime>
 #include <stdlib.h>
+#include "pthread.h"
 #include "s3eWebView.h"
 #include <IwUriEscape.h>
 
@@ -102,6 +103,8 @@ struct pendingRequest {
 	s3eCallback onError;
 };
 
+static pthread_mutex_t mutex;
+
 static std::deque<pendingRequest> _pendingRequests;
 inline std::deque<pendingRequest>& pendingRequests() {
 	return _pendingRequests;
@@ -143,29 +146,28 @@ public:
 		memset(resource, 0, sizeof(resource));
 		sprintf(resource, "/jamp/me/preferences/%s?gameId=%s", key, gameId);
 
+        pendingRequest pr;
+        pr.body = jsonListObject.Serialize();
+        pr.onError = onError;
+        pr.onResult = onResult;
+        pr.resource = std::string(resource);
+        pr.responseObjectType = NONE;
+        pr.sendType = CIwHTTP::PUT;
+        pr.userData = userData;
 
-		if (!pendingRequests().empty() || onGoingRequest && onGoingRequest->requestStatus == ONGOING_REQUEST)
-		{
-			pendingRequest pr;
-			
-			pr.body = jsonListObject.Serialize();
-			pr.onError = onError;
-			pr.onResult = onResult;
-			pr.resource = std::string(resource);
-			pr.responseObjectType = NONE;
-			pr.sendType = CIwHTTP::PUT;
-			pr.userData = userData;
-			pendingRequests().push_back(pr);
-
-			return 0;
-		}
-
+        pthread_mutex_lock(&mutex);
+        pendingRequests().push_back(pr);
+        if (pendingRequests().size() > 1)
+        {
+            pthread_mutex_unlock(&mutex);
+            return 0;
+        }
+        pthread_mutex_unlock(&mutex);
 		
 		_onResult = onResult;
 		_onError = onError;
 
-		onGoingRequest = new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonListObject.Serialize().c_str(), userData);
-		onGoingRequest->base = this;
+		new RequestData(resource, http_object, CIwHTTP::PUT, GotResult, NONE, jsonListObject.Serialize().c_str(), userData);
 
 		return 0;
 	}
@@ -215,13 +217,7 @@ public:
 
 	int32 removeOngoingRequest();
 
-	void *pendingUserData;
-
 protected:
-	/*
-	Details of the on going request
-	*/
-	RequestData *onGoingRequest;
 	/*
 	The http object to communicato to the server
 	*/
