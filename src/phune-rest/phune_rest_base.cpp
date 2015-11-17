@@ -106,8 +106,8 @@ int32 PhuneRestBase::_Init(s3eCallback onResult, s3eCallback onError, void *user
     pr.userData = userData;
     
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
-    if (pendingRequests().size() > 1)
+    _pendingRequests.push_back(pr);
+    if (_pendingRequests.size() > 1)
     {
         pthread_mutex_unlock(&mutex);
         return 0;
@@ -143,7 +143,7 @@ int32 PhuneRestBase::_Login(s3eWebView* g_WebView, s3eCallback onResult, s3eCall
     pr.onResult = onResult;
     
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
+    _pendingRequests.push_back(pr);
     pthread_mutex_unlock(&mutex);
 
 	_onResult = onResult;
@@ -210,7 +210,7 @@ int32 PhuneRestBase::_Logout(s3eCallback onResult, s3eCallback onError, void *us
     pr.userData = userData;
     
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
+    _pendingRequests.push_back(pr);
     pthread_mutex_unlock(&mutex);
     
     _onResult = onResult;
@@ -265,8 +265,8 @@ int32 PhuneRestBase::_GetMe(s3eCallback onResult, s3eCallback onError, void *use
     pr.userData = userData;
 
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
-    if (pendingRequests().size() > 1)
+    _pendingRequests.push_back(pr);
+    if (_pendingRequests.size() > 1)
     {
         pthread_mutex_unlock(&mutex);
         return 0;
@@ -299,8 +299,8 @@ int32 PhuneRestBase::StoreGameDataBase64(const char *gameId, const char *key, un
     pr.userData = userData;
     
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
-    if (pendingRequests().size() > 1)
+    _pendingRequests.push_back(pr);
+    if (_pendingRequests.size() > 1)
     {
         pthread_mutex_unlock(&mutex);
         return 0;
@@ -338,8 +338,8 @@ int32 PhuneRestBase::StoreGameDataJsonBatch(const char *gameId, const char *key,
     pr.userData = userData;
     
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
-    if (pendingRequests().size() > 1)
+    _pendingRequests.push_back(pr);
+    if (_pendingRequests.size() > 1)
     {
         pthread_mutex_unlock(&mutex);
         return 0;
@@ -380,8 +380,8 @@ int32 PhuneRestBase::StoreGameDataJson(const char *gameId, const char *key, cons
     pr.userData = userData;
 
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
-    if (pendingRequests().size() > 1)
+    _pendingRequests.push_back(pr);
+    if (_pendingRequests.size() > 1)
     {
         pthread_mutex_unlock(&mutex);
         return 0;
@@ -413,8 +413,8 @@ int32 PhuneRestBase::GetGameDataBase64(const char *gameId, const char *key, s3eC
     pr.userData = userData;
 
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
-    if (pendingRequests().size() > 1)
+    _pendingRequests.push_back(pr);
+    if (_pendingRequests.size() > 1)
     {
         pthread_mutex_unlock(&mutex);
         return 0;
@@ -445,8 +445,8 @@ int32 PhuneRestBase::GetGameDataJson(const char *gameId, const char *key, s3eCal
     pr.userData = userData;
     
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
-    if (pendingRequests().size() > 1)
+    _pendingRequests.push_back(pr);
+    if (_pendingRequests.size() > 1)
     {
         pthread_mutex_unlock(&mutex);
         return 0;
@@ -477,8 +477,8 @@ int32 PhuneRestBase::GetGameDataJsonList(const char *gameId, const char *key, s3
     pr.userData = userData;
 
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
-    if (pendingRequests().size() > 1)
+    _pendingRequests.push_back(pr);
+    if (_pendingRequests.size() > 1)
     {
         pthread_mutex_unlock(&mutex);
         return 0;
@@ -509,8 +509,8 @@ int32 PhuneRestBase::DeleteGameData(const char *gameId, const char *key, s3eCall
     pr.userData = userData;
     
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
-    if (pendingRequests().size() > 1)
+    _pendingRequests.push_back(pr);
+    if (_pendingRequests.size() > 1)
     {
         pthread_mutex_unlock(&mutex);
         return 0;
@@ -545,8 +545,8 @@ int32 PhuneRestBase::_StartMatch(const char *gameId, s3eCallback onResult, s3eCa
     pr.userData = userData;
 
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
-    if (pendingRequests().size() > 1)
+    _pendingRequests.push_back(pr);
+    if (_pendingRequests.size() > 1)
     {
         pthread_mutex_unlock(&mutex);
         return 0;
@@ -578,8 +578,8 @@ int32 PhuneRestBase::_EndMatch(int64 matchId, PhunePlayer player, s3eCallback on
     pr.userData = userData;
 
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
-    if (pendingRequests().size() > 1)
+    _pendingRequests.push_back(pr);
+    if (_pendingRequests.size() > 1)
     {
         pthread_mutex_unlock(&mutex);
         return 0;
@@ -612,8 +612,8 @@ int32 PhuneRestBase::_StoreMatchEvents(JsonListObject<GameTriggerdEvent> events,
     pr.userData = userData;
    
     pthread_mutex_lock(&mutex);
-    pendingRequests().push_back(pr);
-    if (pendingRequests().size() > 1)
+    _pendingRequests.push_back(pr);
+    if (_pendingRequests.size() > 1)
     {
         pthread_mutex_unlock(&mutex);
         return 0;
@@ -659,9 +659,9 @@ int32 PhuneRestBase::GotResult(void *result, void *userData){
 
         pthread_mutex_lock(&mutex);
         //remove the first element of the list
-        pendingRequests().pop_front();
+        _pendingRequests.pop_front();
 		//empty List of pending requests
-		if (pendingRequests().empty()){
+		if (_pendingRequests.empty()){
             delete requestData;
             requestData = NULL;
 			//has finished the pending requests
@@ -671,10 +671,10 @@ int32 PhuneRestBase::GotResult(void *result, void *userData){
 		else{
 			//print the pending requests in order
 			IwTrace(PHUNE, ("The content of pending requests are:"));
-			for (std::deque<pendingRequest>::iterator it = pendingRequests().begin(); it != pendingRequests().end(); ++it){
+			for (std::deque<pendingRequest>::iterator it = _pendingRequests.begin(); it != _pendingRequests.end(); ++it){
 				IwTrace(PHUNE, ("resource:%s", it->resource.c_str()));
 			}
-			pendingRequest pr = pendingRequests().front();
+			pendingRequest pr = _pendingRequests.front();
 			PhuneRestBase::_onResult = pr.onResult;
 			PhuneRestBase::_onError = pr.onError;
 
@@ -697,8 +697,8 @@ int32 PhuneRestBase::_onHideWebView(s3eWebView *instance, void *systemData, void
 		IwTrace(PHUNE, ("PhuneRestBase::onHideWebView Found login Redirect:%s", out.c_str()));
 		
         pthread_mutex_lock(&mutex);
-        pendingRequest pr = pendingRequests().front();
-        pendingRequests().pop_front();
+        pendingRequest pr = _pendingRequests.front();
+        _pendingRequests.pop_front();
         pthread_mutex_unlock(&mutex);
         
 		int tmp = STOP_VIEW;
@@ -726,8 +726,8 @@ int32 PhuneRestBase::_onHideWebView(s3eWebView *instance, void *systemData, void
         
         
         pthread_mutex_lock(&mutex);
-        pendingRequests().push_back(pr);
-        if (pendingRequests().size() > 1)
+        _pendingRequests.push_back(pr);
+        if (_pendingRequests.size() > 1)
         {
             pthread_mutex_unlock(&mutex);
             return 0;
@@ -753,8 +753,8 @@ int32 PhuneRestBase::_onLogoutWebView(s3eWebView *instance, void *systemData, vo
     if (out.find(LOGOUT_FACEBOOK_REDIRECT)==0){
         
         pthread_mutex_lock(&mutex);
-        pendingRequest pr = pendingRequests().front();
-        pendingRequests().pop_front();
+        pendingRequest pr = _pendingRequests.front();
+        _pendingRequests.pop_front();
         pthread_mutex_unlock(&mutex);
         
         s3eWebViewUnRegister(S3E_WEBVIEW_FINISHED_LOADING, _onLogoutWebView, instance);
