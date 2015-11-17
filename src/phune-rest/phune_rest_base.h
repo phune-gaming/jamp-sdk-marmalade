@@ -106,9 +106,6 @@ struct pendingRequest {
 static pthread_mutex_t mutex;
 
 static std::deque<pendingRequest> _pendingRequests;
-inline std::deque<pendingRequest>& pendingRequests() {
-	return _pendingRequests;
-}
 
 /*
 Class to represent a request
@@ -156,8 +153,8 @@ public:
         pr.userData = userData;
 
         pthread_mutex_lock(&mutex);
-        pendingRequests().push_back(pr);
-        if (pendingRequests().size() > 1)
+        _pendingRequests.push_back(pr);
+        if (_pendingRequests.size() > 1)
         {
             pthread_mutex_unlock(&mutex);
             return 0;
